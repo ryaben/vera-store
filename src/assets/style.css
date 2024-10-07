@@ -1,0 +1,150 @@
+@import './variables.css';
+
+:root {
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: var(--indigo-dark);
+  background-color: var(--white-mute);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+input,
+textarea,
+select,
+button {
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  font-size: 14px;
+  resize: none;
+}
+
+body {
+  margin: 0;
+}
+
+a {
+  text-decoration: none;
+  color: var(--light-brown);
+  font-weight: bold;
+}
+
+p {
+  margin: 0 auto 10px auto;
+  text-align: justify;
+  text-justify: auto;
+}
+
+h2 {
+  font-size: 19px;
+  font-weight: bold;
+}
+
+button.action-button.disabled,
+button.action-button.disabled a,
+button.change-quantity-button.disabled,
+input.disabled {
+  pointer-events: none;
+  background-color: var(--silver-dark);
+  color: var(--indigo-dark);
+}
+
+label {
+  font-size: 16px;
+}
+
+.flex {
+  display: flex;
+}
+.flex.column {
+  flex-direction: column;
+}
+.flex.wide {
+  width: 100%;
+}
+.flex.tall {
+  height: 100%;
+}
+.flex.y-centered {
+  align-items: center;
+}
+.flex.x-centered {
+  justify-content: center;
+}
+.flex.space-between {
+  justify-content: space-between;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+.page-section {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  margin: 15px 3% 0 3%;
+}
+
+.action-button {
+  font-size: 13px;
+  font-weight: bold;
+  border-width: 2px;
+  border-radius: 12px;
+  border-style: solid;
+  border-color: var(--black);
+  background-color: var(--intense-brown);
+  color: var(--soft-beige);
+}
+
+.action-button.large {
+  width: 47%;
+  height: 55px;
+  font-size: 16px;
+}
+
+.action-button.red {
+  background-color: var(--triggerable);
+}
+
+.action-button a {
+  color: var(--soft-beige);
+}
+
+img.loading-image {
+  width: 32px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color: var(--white);
+    background-color: var(--black-soft);
+  }
+}
+
+/* Vue transitions */
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.slide-left-enter-active,
+.slide-left-leave-active {
+  transition: all 0.25s;
+}
+
+.slide-left-enter-from,
+.slide-left-leave-to {
+  transform: translateX(-100%);
+}
