@@ -24,6 +24,10 @@ button {
   resize: none;
 }
 
+input[type=radio], input[type=checkbox] {
+  margin: 0 4px 0 4px;
+}
+
 body {
   margin: 0;
 }
@@ -64,7 +68,7 @@ label {
 .flex.column {
   flex-direction: column;
 }
-.flex.wide {
+.wide {
   width: 100%;
 }
 .flex.tall {
@@ -79,16 +83,47 @@ label {
 .flex.space-between {
   justify-content: space-between;
 }
+.flex.space-evenly {
+  justify-content: space-evenly;
+}
 
 .bold {
   font-weight: bold;
+}
+
+.hidden {
+  display: none;
+}
+
+.top-margin {
+  margin-top: 15px;
+}
+
+.bottom-margin {
+  margin-bottom: 15px;
+}
+
+.vue-notification .notification-title {
+  font-size: 18px;
+}
+
+.vue-notification .notification-content {
+  font-size: 14px;
 }
 
 .page-section {
   display: flex;
   align-items: center;
   flex-direction: column;
-  margin: 15px 3% 0 3%;
+  margin: 2.5%;
+}
+
+.page-section.bordered {
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  border: 2px solid var(--black-soft);
+  border-radius: 4px;
 }
 
 .action-button {
@@ -116,6 +151,10 @@ label {
   color: var(--soft-beige);
 }
 
+.negative-text {
+  color: var(--triggerable);
+}
+
 img.loading-image {
   width: 32px;
 }
@@ -124,6 +163,10 @@ img.loading-image {
   :root {
     color: var(--white);
     background-color: var(--black-soft);
+  }
+
+  .page-section.bordered {
+    border-color: var(--white-mute);
   }
 }
 

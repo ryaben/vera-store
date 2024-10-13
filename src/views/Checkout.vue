@@ -3,6 +3,7 @@ import store from '../store';
 import AnimateHeight from 'vue-animate-height';
 import { db } from '../firebase/init.js';
 import { collection, addDoc } from "firebase/firestore";
+import Recaptcha from '../components/ReCaptcha.vue';
 
 defineProps({
     cartList: {
@@ -25,7 +26,7 @@ defineProps({
             <p>Processing...</p>
         </div>
         <h2 class="form-title">Order request</h2>
-        <form class="flex column wide" action="" @submit.prevent="issueOrder">
+        <form class="flex column wide" @submit.prevent="issueOrder">
             <div class="form-field flex column y-centered">
                 <label for="checkoutFormName">Full name</label>
                 <input type="text" id="checkoutFormName" required placeholder="John Doe" v-model="customerName">
@@ -52,7 +53,7 @@ defineProps({
                 </div>
             </div>
             <AnimateHeight :duration="300" :height="noteHeight" :animate-opacity="true">
-                <p id="cartNotice" v-show="cartTotal < 20">
+                <p id="cartNotice" class="negative-text" v-show="cartTotal < 20">
                     Minimum amount of <b>$20</b> not reached. This is a threshold that Payoneer imposes for payment requests.
                     You can instead either choose 'Cash' as payment method, or <router-link
                         :to="{ name: 'Store' }">add more items to the order</router-link>.
@@ -68,13 +69,14 @@ defineProps({
                     Dollar (USD).
                 </p>
             </AnimateHeight>
-            <div class="flex wide space-between">
+            <Recaptcha class="order-recaptcha flex x-centered" @checkbox="checkRecaptcha" />
+            <div class="flex wide space-between" style="margin-bottom: 25px;">
                 <button class="action-button large red flex y-centered x-centered">
                     <router-link class="flex wide tall x-centered y-centered" :to="{ name: 'Cart' }">Back to
                         cart</router-link>
                 </button>
                 <input class="action-button large" type="submit" value="Issue order"
-                    :class="{ 'disabled': paymentMethod === 'card' && cartTotal < 20 }">
+                    :class="{ 'disabled': (paymentMethod === 'card' && cartTotal < 20) || !passedRecaptcha || cartTotal <= 0 }">
             </div>
         </form>
     </section>
@@ -84,7 +86,7 @@ defineProps({
 export default {
     name: 'Checkout',
     components: {
-        AnimateHeight
+        AnimateHeight, Recaptcha
     },
     data() {
         return {
@@ -92,7 +94,8 @@ export default {
             customerName: '',
             customerEmail: '',
             paymentMethod: 'cash',
-            processingOrder: false
+            processingOrder: false,
+            passedRecaptcha: false
         }
     },
     computed: {
@@ -128,6 +131,9 @@ export default {
             await store.dispatch("clearCart");
             this.processingOrder = false;
             this.$router.push({name: 'Order', params: { orderID: docRef.id }});
+        },
+        async checkRecaptcha(value) {
+            this.passedRecaptcha = value;
         }
     }
 }
@@ -174,9 +180,12 @@ export default {
 
 #cartNotice {
     font-size: 13px;
-    color: var(--triggerable);
     margin: -5px auto 15px auto;
     width: 95%;
+}
+
+.order-recaptcha {
+    margin-bottom: 25px;
 }
 
 .payoneer-text {

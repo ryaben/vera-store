@@ -7,6 +7,8 @@ import AboutUs from "/src/views/AboutUs.vue";
 import Cart from "/src/views/Cart.vue";
 import Checkout from "/src/views/Checkout.vue";
 import Order from "/src/views/Order.vue";
+import ItemDescription from "/src/views/ItemDescription.vue";
+import AdminPanel from "/src/views/AdminPanel.vue";
 
 //Rutas
 const routes = [
@@ -19,6 +21,12 @@ const routes = [
     path: "/store",
     name: "Store",
     component: Store
+  },
+  {
+    path: "/store/:itemID",
+    name: "ItemDescription",
+    component: ItemDescription,
+    props: true
   },
   {
     path: "/about-us",
@@ -40,7 +48,12 @@ const routes = [
     name: "Order",
     component: Order,
     props: true
-  }
+  },
+  {
+    path: "/admin",
+    name: "AdminPanel",
+    component: AdminPanel
+  },
 ];
 
 const router = createRouter({

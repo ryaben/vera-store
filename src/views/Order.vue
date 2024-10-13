@@ -15,15 +15,22 @@ defineProps({
 
 <template>
     <section class="page-section">
-        <div class="flex column y-centered" v-if="!orderData">
+        <div class="flex column y-centered" v-if="!ordersList.length && !orderData">
             <img class="loading-image" src="/img/loading.gif" alt="Loading">
             <p>Loading data...</p>
+        </div>
+        <div class="flex column y-centered" v-if="ordersList.length && orderData === undefined">
+            <p>An order with such ID does not exist.</p>
+            <button class="action-button large red flex y-centered x-centered">
+                <router-link class="flex x-centered y-centered" :to="{ name: 'Store' }">Go to
+                    store</router-link>
+            </button>
         </div>
         <div v-if="orderData" class="flex column y-centered">
             <h2 class="order-title">Order<br>{{ orderData.id }}</h2>
             <div style="margin-bottom: 20px;">
                 <p class="item-list" v-for="(item, i) in differentItemsInCart" :key="i">
-                    • {{ item.amount }} x {{ itemsList.find((el) => {return el.id === item.id}).title }}
+                    • {{ item.amount }} x {{ itemsList.find((el) => { return el.id === item.id }).title }}
                 </p>
                 <p class="items-total bold">${{ orderData.orderPrice.toFixed(2) }}</p>
             </div>
@@ -59,8 +66,8 @@ defineProps({
             <p class="status-note" v-if="orderData.orderStatus === 1">
                 Everything is set! Your package of items is ready, so next step is receiving your payment. If you chose
                 payment in cash, it will be on delivery. If you chose Payoneer to pay with credit/debit card or bank
-                transfer,
-                then the payment link should already be available here.
+                transfer, then the payment link should already be available here. Once you pay, please await up to 48 hours
+                until our confirmation.
             </p>
             <p class="status-note" v-if="orderData.orderStatus === 2">
                 There's nothing else to be done on your end! You'll enjoy your items when we deliver them on your
@@ -69,17 +76,19 @@ defineProps({
             <p class="status-note" v-if="orderData.orderStatus === 3">
                 You have your souvenirs! We hope you enjoy them back home, and we thank you for your purchase!
             </p>
-            <p>
-                Payment method:
-                <span class="bold" v-if="orderData.paymentMethod === 'cash'">Cash</span>
-                <span class="bold" v-if="orderData.paymentMethod === 'card'">Payoneer</span>
-            </p>
-            <p v-if="orderData.paymentMethod === 'card'">
-                Payment link:
-                <span v-if="orderData.paymentLink === ''">Not available yet.</span>
-                <a v-if="orderData.paymentLink !== ''" class="bold" :href="orderData.paymentLink" target="_blank">{{
-                    orderData.paymentLink }}</a>
-            </p>
+            <div class="payment-data">
+                <p>
+                    Payment method:
+                    <span class="bold" v-if="orderData.paymentMethod === 'cash'">Cash</span>
+                    <span class="bold" v-if="orderData.paymentMethod === 'card'">Payoneer</span>
+                </p>
+                <p v-if="orderData.paymentMethod === 'card'">
+                    Payment link:
+                    <span v-if="orderData.paymentLink === ''">Not available yet</span>
+                    <a v-if="orderData.paymentLink !== ''" class="bold" :href="orderData.paymentLink" target="_blank">{{
+                        orderData.paymentLink }}</a>
+                </p>
+            </div>
         </div>
     </section>
 </template>
@@ -110,7 +119,7 @@ export default {
                 });
 
                 if (itemCheck === undefined) {
-                    items.push({id: orderItem, amount: 1});
+                    items.push({ id: orderItem, amount: 1 });
                 } else {
                     itemCheck.amount++;
                 }
@@ -133,6 +142,7 @@ export default {
 
 .item-list {
     font-size: 16px;
+    text-align: left;
 }
 
 .items-total {
@@ -185,6 +195,11 @@ export default {
     font-size: 14px;
     margin-bottom: 25px;
     width: 90%;
+}
+
+.payment-data p {
+    text-align: left;
+    width: max-content;
 }
 
 @media (prefers-color-scheme: light) {}

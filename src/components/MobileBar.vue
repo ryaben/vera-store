@@ -3,7 +3,7 @@ defineProps({
     title: {
         type: String,
         required: false,
-        default: 'Vera Souvenirs'
+        default: 'Argentina Deli Shop'
     },
     links: {
         type: Array,
@@ -28,15 +28,15 @@ defineProps({
             <router-link class="cart-container flex" :to="{ name: 'Cart' }">
                 <div class="flex">
                     <Transition name="fade">
-                        <div v-if="itemCount.length > 0" class="cart-count-container flex"><label>{{ itemCount.length
-                                }}</label></div>
+                        <div v-if="itemCount > 0" class="cart-count-container flex"><label>{{ itemCount }}</label></div>
                     </Transition>
                 </div>
             </router-link>
         </div>
 
         <Transition name="slide-left">
-            <div class="buttons-container flex column space-between" v-if="activeMore" :class="{ 'active': activeMore }">
+            <div class="buttons-container flex column space-between" v-if="activeMore"
+                :class="{ 'active': activeMore }">
                 <div class="flex column">
                     <div class="buttons-container-title flex y-centered x-centered">
                         <label>Menu</label>
@@ -47,7 +47,7 @@ defineProps({
                     </router-link>
                 </div>
                 <div class="flex">
-                    <p class="software-info">Vera Souvenirs ver. 1.0<br>made by Ramiro Yaben</p>
+                    <p class="software-info">Argentina Deli Shop ver. 1.0<br>made by Ramiro Yaben</p>
                 </div>
             </div>
         </Transition>
@@ -153,12 +153,14 @@ export default {
     left: 0;
     top: 0;
     width: 50%;
+    max-width: 350px;
     height: 100%;
     z-index: 2;
 }
 
 .buttons-container-title {
     height: 50px;
+    border-top-right-radius: 10px;
     background-color: var(--light-brown);
     color: var(--black-mute);
 }
@@ -169,7 +171,7 @@ export default {
 }
 
 .link-button {
-    height: 45px;
+    height: 55px;
     transition: background-color 0.2s;
 }
 

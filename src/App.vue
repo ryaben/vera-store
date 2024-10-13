@@ -4,17 +4,19 @@ import MobileBar from './components/MobileBar.vue';
 </script>
 
 <template>
-  <MobileBar :links="mobileBarLinks" :item-count="cartList" />
+  <MobileBar :links="mobileBarLinks" :item-count="cartList.length" />
 
   <main>
     <router-view v-slot="{ Component }">
       <Transition name="fade" mode="out-in">
-        <KeepAlive :include="['Store', 'Checkout']">
+        <KeepAlive :include="['Store', 'Checkout', 'Admin Panel']">
           <component :is="Component" :items-list="itemsList" :orders-list="ordersList" :cart-list="cartList" />
         </KeepAlive>
       </Transition>
     </router-view>
   </main>
+
+  <notifications position="top center" width="350px" :speed="700" :pause-on-hover="true" />
 </template>
 
 <script>
