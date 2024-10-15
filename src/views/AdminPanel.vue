@@ -8,6 +8,11 @@ defineProps({
         type: Array,
         required: false,
         default: store.getters.items
+    },
+    partnersList: {
+        type: Array,
+        required: false,
+        default: store.getters.partners
     }
 });
 </script>
@@ -27,6 +32,12 @@ defineProps({
                 <label class="flex wide bold x-centered y-centered" for="ordersTab"
                     :class="{ 'selected': selectedTab === 'orders' }">Customer orders</label>
             </div>
+            <div class="flex x-centered y-centered wide section-button">
+                <input id="partnersTab" class="hidden" type="radio" name="selected-tab" value="partners"
+                    v-model="selectedTab">
+                <label class="flex wide bold x-centered y-centered" for="partnersTab"
+                    :class="{ 'selected': selectedTab === 'partners' }">Partner locations</label>
+            </div>
         </div>
         <div class="tab-container flex wide" v-show="selectedTab === 'orders'">
             <Panel class="admin-panel" :card-source="ordersList" :panel-type="'order'" @clicked-card="populateOrderForm" />
@@ -35,6 +46,10 @@ defineProps({
         <div class="tab-container flex wide" v-show="selectedTab === 'items'">
             <Panel class="admin-panel" :card-source="itemsList" :panel-type="'item'" @clicked-card="populateItemForm" />
             <PanelForm class="panel-form" :form-type="'item'" :form-info="itemForm" :items-list="itemsList" />
+        </div>
+        <div class="tab-container flex wide" v-show="selectedTab === 'partners'">
+            <Panel class="admin-panel" :card-source="partnersList" :panel-type="'item'" @clicked-card="populateItemForm" />
+            <PanelForm class="panel-form" :form-type="'item'" :form-info="partnersForm" :items-list="itemsList" />
         </div>
     </section>
 </template>
@@ -91,7 +106,7 @@ export default {
 <style scoped>
 .section-selector-container {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
     border-bottom: 2px solid var(--white-soft);
 }
 
@@ -109,6 +124,7 @@ export default {
 
 .section-button label.selected {
     background-color: var(--soft-brown);
+    color: var(--white-soft);
 }
 
 .admin-panel {

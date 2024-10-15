@@ -1,7 +1,7 @@
 <script setup>
 import store from '../store';
 import { db } from '../firebase/init.js';
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, updateDoc, setDoc } from "firebase/firestore";
 import { getStorage, getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { notify } from "@kyvg/vue3-notification";
 
@@ -35,10 +35,11 @@ defineProps({
             <span v-if="formType === 'order'">Order</span>
             <span v-if="formType === 'item'">Item</span>:
             <br>
-            <router-link v-if="formType === 'order'" class="bold" :to="'/order/' + formInfo.id">{{ formInfo.id
-                }}</router-link>
-            <router-link v-if="formType === 'item'" class="bold" :to="'/store/' + formInfo.id">{{ formInfo.id
-                }}</router-link>
+            <router-link v-if="formType === 'order' && !formAdd" class="bold" :to="'/order/' + formInfo.id">{{ formInfo.id
+            }}</router-link>
+            <router-link v-if="formType === 'item' && !formAdd" class="bold" :to="'/store/' + formInfo.id">{{ formInfo.id
+            }}</router-link>
+            <span v-if="formAdd">New ID will be generated.</span>
         </p>
 
         <form class="flex column wide" v-if="formType === 'order'" @submit.prevent="updateOrder">
@@ -58,8 +59,14 @@ defineProps({
                     • {{ item.amount }} x {{ itemsList.find((el) => { return el.id === item.id }).title }}
                 </p>
             </div>
-            <label class="flex x-centered" for="orderPrice">Price:&nbsp;<input v-model="formInfo.orderPrice"
-                    id="orderPrice" class="form-field number" type="number"></label>
+            <label class="flex x-centered" for="orderPrice">
+                Total:&nbsp;
+                <select name="orderCurrency" id="currencySelector" v-model="formInfo.orderCurrency">
+                    <option value="usd">USD</option>
+                    <option value="ars">ARS</option>
+                </select>
+                <input v-model="formInfo.orderPrice" id="orderPrice" class="form-field number" type="number">
+            </label>
             <p class="form-subtitle bold">Customer info:</p>
             <div class="flex column y-centered">
                 <label for="customerName" class="field-label flex x-centered wide">Name:&nbsp;<input
@@ -82,15 +89,17 @@ defineProps({
                 value="Update order">
         </form>
 
-        <form class="flex column wide" v-if="formType === 'item'" @submit.prevent="updateItem">
-            <label class="flex wide x-centered bottom-margin" for="itemTitle">Title:&nbsp;<input
-                    v-model="formInfo.title" id="itemTitle" class="form-field" type="text"></label>
+        <form class="flex column wide" v-if="formType === 'item'" @submit.prevent="formAdd ? createItem() : updateItem()">
+            <label class="flex wide x-centered bottom-margin" for="itemTitle">
+                Title:&nbsp;
+                <input v-model="formInfo.title" id="itemTitle" class="form-field" type="text">
+            </label>
             <div class="flex column wide y-centered">
                 <img class="item-photo" :src="formInfo.photo" alt="Photo">
                 <input id="photoFile" type="file" @input="previewImage" accept="image/png">
             </div>
             <label class="flex x-centered top-margin bottom-margin" for="itemPrice">Price:&nbsp;<input
-                    v-model="formInfo.price" id="itemPrice" class="form-field number" type="number"></label>
+                    v-model="formInfo.price" id="itemPrice" class="form-field number" type="number" step=".01"></label>
             <label class="flex column wide y-centered">
                 Short description:
                 <textarea rows="3" class="item-textarea" name="shortDescription"
@@ -105,8 +114,12 @@ defineProps({
                 <input id="itemAvailability" type="checkbox" v-model="formInfo.available">
                 Available
             </label>
-            <input type="submit" class="submit-button action-button large" :class="{ 'disabled': !formInfo.id }"
+            <input type="submit" class="submit-button action-button large" :class="{ 'disabled': !formInfo.id && !formAdd }"
                 :value="formAdd ? 'Add new item' : 'Update item'">
+        </form>
+
+        <form class="flex column wide" v-if="formType === 'item'" @submit.prevent="formAdd ? createPartner : updatePartner">
+
         </form>
     </div>
 </template>
@@ -143,14 +156,43 @@ export default {
         previewImage(event) {
             this.photoSource = event.target.files[0];
             this.formInfo.photo = URL.createObjectURL(this.photoSource);
+            this.updateItemPhoto();
         },
         async updateItem() {
+            const that = this;
+            const itemRef = doc(db, "items", this.formInfo.id);
+
+            await updateDoc(itemRef, {
+                available: that.formInfo.available,
+                longDescription: that.formInfo.longDescription,
+                price: that.formInfo.price,
+                shortDescription: that.formInfo.shortDescription,
+                title: that.formInfo.title
+            });
+
+            that.updateNotification();
+        },
+        async updateItemPhoto() {
             const that = this;
             const itemRef = doc(db, "items", this.formInfo.id);
 
             this.uploadPhoto(this.formInfo.id, 'items', function (fileName) {
                 that.generatePhotoReference(fileName, 'items', async function (photoReference) {
                     await updateDoc(itemRef, {
+                        photo: photoReference,
+                    });
+
+                    that.updatePhotoNotification();
+                });
+            });
+        },
+        async createItem() {
+            const that = this;
+            const autoID = this.generateFirestoreId();
+
+            this.uploadPhoto(autoID, 'items', function (fileName) {
+                that.generatePhotoReference(fileName, 'items', async function (photoReference) {
+                    await setDoc(doc(db, "items", autoID), {
                         available: that.formInfo.available,
                         longDescription: that.formInfo.longDescription,
                         photo: photoReference,
@@ -159,7 +201,7 @@ export default {
                         title: that.formInfo.title
                     });
 
-                    that.updateNotification();
+                    that.addNotification();
                 });
             });
         },
@@ -208,10 +250,21 @@ export default {
         toggleFormAdd() {
             this.formAdd = !this.formAdd;
         },
+        generateFirestoreId() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+            return Array.from(crypto.getRandomValues(new Uint8Array(20))).map(b => chars[b % chars.length]).join('');
+        },
         updateNotification() {
             notify({
                 title: "Update successful",
                 text: "The database entry was successfully updated!",
+                type: "success"
+            });
+        },
+        updatePhotoNotification() {
+            notify({
+                title: "Photo update successful",
+                text: "The item's photo was successfully updated!",
                 type: "success"
             });
         },
@@ -302,6 +355,12 @@ div>.item-count:last-of-type {
 .item-textarea {
     width: 70%;
     overflow-y: scroll;
+}
+
+#currencySelector {
+    font-size: 16px;
+    height: 25px;
+    width: 60px;
 }
 
 @media (prefers-color-scheme: light) {}

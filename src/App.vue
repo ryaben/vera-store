@@ -10,7 +10,7 @@ import MobileBar from './components/MobileBar.vue';
     <router-view v-slot="{ Component }">
       <Transition name="fade" mode="out-in">
         <KeepAlive :include="['Store', 'Checkout', 'Admin Panel']">
-          <component :is="Component" :items-list="itemsList" :orders-list="ordersList" :cart-list="cartList" />
+          <component :is="Component" :items-list="itemsList" :orders-list="ordersList" :cart-list="cartList" :partners-list="partnersList" />
         </KeepAlive>
       </Transition>
     </router-view>
@@ -45,9 +45,13 @@ export default {
     cartList() {
       return store.getters.cart;
     },
+    partnersList() {
+      return store.getters.partners;
+    },
   },
   async beforeCreate() {
     await store.dispatch('getItems');
+    await store.dispatch('getPartners');
   }
 }
 </script>

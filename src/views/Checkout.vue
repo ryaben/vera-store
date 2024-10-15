@@ -1,5 +1,6 @@
 <script setup>
 import store from '../store';
+import axios from "axios";
 import AnimateHeight from 'vue-animate-height';
 import { db } from '../firebase/init.js';
 import { collection, addDoc } from "firebase/firestore";
@@ -38,25 +39,33 @@ defineProps({
             </div>
             <div class="purchase-overview flex space-between">
                 <p>{{ cartList.length }} items</p>
-                <p class="total-price">${{ cartTotal.toFixed(2) }}</p>
+                <div class="flex" style="margin: auto;">
+                    <select name="orderCurrency" id="currencySelector" v-model="orderCurrency">
+                        <option value="usd">USD</option>
+                        <option v-if="paymentMethod === 'cash'" value="ars">ARS</option>
+                    </select>
+                    <p v-if="orderCurrency === 'usd'" class="total-price">{{ cartTotal.toFixed(2) }}</p>
+                    <p v-if="orderCurrency === 'ars'" class="total-price">{{ (cartTotal * blueDollarRate).toFixed(2) }}</p>
+                </div>
             </div>
             <div class="flex column wide" style="margin-bottom: 20px;">
                 <div class="flex y-centered">
-                    <input id="methodCash" type="radio" name="payment-method" value="cash" @change="updateHeight"
+                    <input id="methodCash" type="radio" name="payment-method" value="cash" @change="updateHeight(); updateCurrencyToUSD()"
                         v-model="paymentMethod">
-                    <label for="methodCash">Cash (USD, EUR, GBP or ARS)</label>
+                    <label for="methodCash">Cash (USD or Argentinean Peso)</label>
                 </div>
                 <div class="flex y-centered">
-                    <input id="methodCard" type="radio" name="payment-method" value="card" @change="updateHeight"
+                    <input id="methodCard" type="radio" name="payment-method" value="card" @change="updateHeight(); updateCurrencyToUSD()"
                         v-model="paymentMethod">
                     <label for="methodCard">Credit/debit card, bank transfer</label>
                 </div>
             </div>
             <AnimateHeight :duration="300" :height="noteHeight" :animate-opacity="true">
                 <p id="cartNotice" class="negative-text" v-show="cartTotal < 20">
-                    Minimum amount of <b>$20</b> not reached. This is a threshold that Payoneer imposes for payment requests.
-                    You can instead either choose 'Cash' as payment method, or <router-link
-                        :to="{ name: 'Store' }">add more items to the order</router-link>.
+                    Minimum amount of <b>$20</b> not reached. This is a threshold that Payoneer imposes for payment
+                    requests.
+                    You can instead either choose 'Cash' as payment method, or <router-link :to="{ name: 'Store' }">add more
+                        items to the order</router-link>.
                 </p>
                 <p class="form-note">
                     Payment will be processed by <img src="/img/payoneer.png" alt="Logo"><a class="payoneer-text"
@@ -70,7 +79,7 @@ defineProps({
                 </p>
             </AnimateHeight>
             <Recaptcha class="order-recaptcha flex x-centered" @checkbox="checkRecaptcha" />
-            <div class="flex wide space-between" style="margin-bottom: 25px;">
+            <div class="flex wide space-between" style="margin-bottom: 20px;">
                 <button class="action-button large red flex y-centered x-centered">
                     <router-link class="flex wide tall x-centered y-centered" :to="{ name: 'Cart' }">Back to
                         cart</router-link>
@@ -90,12 +99,14 @@ export default {
     },
     data() {
         return {
+            blueDollarRate: 0,
             noteHeight: 0,
             customerName: '',
             customerEmail: '',
             paymentMethod: 'cash',
             processingOrder: false,
-            passedRecaptcha: false
+            passedRecaptcha: false,
+            orderCurrency: 'usd'
         }
     },
     computed: {
@@ -107,11 +118,14 @@ export default {
             });
 
             return totalValue;
-        },
+        }
     },
     methods: {
         updateHeight() {
             return this.noteHeight = this.noteHeight === 0 ? 'auto' : 0;
+        },
+        updateCurrencyToUSD() {
+            this.orderCurrency = 'usd';
         },
         async issueOrder() {
             this.processingOrder = true;
@@ -130,11 +144,21 @@ export default {
 
             await store.dispatch("clearCart");
             this.processingOrder = false;
-            this.$router.push({name: 'Order', params: { orderID: docRef.id }});
+            this.$router.push({ name: 'Order', params: { orderID: docRef.id } });
         },
         async checkRecaptcha(value) {
             this.passedRecaptcha = value;
         }
+    },
+    mounted() {
+        const that = this;
+        axios.get("https://dolarapi.com/v1/dolares/blue")
+            .then(function (response) {
+                return that.blueDollarRate = (response.data.venta + response.data.compra) / 2;
+            })
+            .catch(function (error) {
+                return console.log(error);
+            })
     }
 }
 </script>
@@ -156,6 +180,13 @@ export default {
     margin: 10px auto 20px auto;
     width: 95%;
     border-bottom: 2px solid var(--white);
+}
+
+#currencySelector {
+    font-size: 16px;
+    height: 25px;
+    width: 60px;
+    margin-right: 5px;
 }
 
 .total-price {

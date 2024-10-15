@@ -6,7 +6,8 @@ const store = createStore({
     state: {
         items: [],
         orders: [],
-        cart: []
+        cart: [],
+        partners: []
     },
     getters: {
         items(state) {
@@ -17,6 +18,9 @@ const store = createStore({
         },
         cart(state) {
             return state.cart;
+        },
+        partners(state) {
+            return state.partners;
         }
     },
     mutations: {
@@ -25,6 +29,9 @@ const store = createStore({
         },
         SET_ORDERS(state, value) {
             state.orders = value;
+        },
+        SET_PARTNERS(state, value) {
+            state.partners = value;
         },
         ADD_CART(state, value) {
             state.cart = state.cart.concat(value);
@@ -55,6 +62,17 @@ const store = createStore({
             });
 
             context.commit('SET_ORDERS', ordersList);
+        },
+        async getPartners(context) {
+            const q = query(collection(db, "partners"));
+            let partnersList = [];
+
+            const querySnapshot = await getDocs(q);
+            querySnapshot.forEach((doc) => {
+                partnersList.push({ id: doc.id, ...doc.data() });
+            });
+
+            context.commit('SET_PARTNERS', partnersList);
         },
         addToCart(context, payload) {
             context.commit('ADD_CART', payload.addedToCart);

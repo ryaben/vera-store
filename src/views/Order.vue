@@ -202,5 +202,9 @@ export default {
     width: max-content;
 }
 
-@media (prefers-color-scheme: light) {}
+@media (prefers-color-scheme: light) {
+    .items-total {
+    border-color: var(--black);
+}
+}
 </style>
