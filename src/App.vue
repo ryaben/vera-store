@@ -1,15 +1,21 @@
 <script setup>
 import store from './store';
 import MobileBar from './components/MobileBar.vue';
+import NavBar from './components/NavBar.vue';
+import { useWindowSize } from 'vue-window-size';
+const { width, height } = useWindowSize();
+const windowWidth = width;
+const windowHeight = height;
 </script>
 
 <template>
-  <MobileBar :links="mobileBarLinks" :item-count="cartList.length" />
+  <MobileBar v-if="windowWidth <= 750" :links="mobileBarLinks" :item-count="cartList.length" />
+  <NavBar v-if="windowWidth > 750" :links="mobileBarLinks" :item-count="cartList.length" />
 
   <main>
     <router-view v-slot="{ Component }">
       <Transition name="fade" mode="out-in">
-        <KeepAlive :include="['Store', 'Checkout', 'Admin Panel']">
+        <KeepAlive :include="['Store', 'Cart', 'Admin Panel']">
           <component :is="Component" :items-list="itemsList" :orders-list="ordersList" :cart-list="cartList" :partners-list="partnersList" />
         </KeepAlive>
       </Transition>
@@ -22,7 +28,7 @@ import MobileBar from './components/MobileBar.vue';
 <script>
 export default {
   components: {
-    MobileBar
+    MobileBar, NavBar
   },
   data() {
     return {

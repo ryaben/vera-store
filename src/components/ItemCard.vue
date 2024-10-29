@@ -19,7 +19,7 @@ defineProps({
         required: false,
         default: store.getters.cart
     }
-})
+});
 </script>
 
 <template>
@@ -32,7 +32,7 @@ defineProps({
                         :to="{ name: 'ItemDescription', params: { itemID: itemInfo.id } }" class="see-more-text">More
                         info...</router-link></p>
                 <label class="item-price">${{ itemInfo.price.toFixed(2) }}</label>
-                <label class="negative-text" v-if="!itemInfo.available">Currently unavailable</label>
+                <label class="negative-text" v-if="!itemInfo.itemAvailability">Currently unavailable</label>
             </div>
             <div class="flex y-centered space-between">
                 <div class="quantity-container flex">
@@ -42,7 +42,7 @@ defineProps({
                     <button class="change-quantity-button flex column y-centered" @click="changeCartQuantity(1)"
                         :class="{ 'disabled': cartQuantity >= 20 }">+</button>
                 </div>
-                <button class="action-button add-button" :class="{ 'disabled': !itemInfo.available }"
+                <button class="action-button add-button" :class="{ 'disabled': !itemInfo.itemAvailability }"
                     @click="addToCart">Add to cart</button>
             </div>
         </div>
@@ -77,10 +77,11 @@ export default {
 <style scoped>
 .item-card {
     justify-content: space-between;
-    margin: 2px 0 2px 0;
+    margin: 4px 0 4px 0;
     padding: 3%;
     border: 2px solid var(--pale-tone);
-    border-radius: 8px;
+    background-color: var(--dark-grey);
+    border-radius: 6px;
     min-height: 170px;
 }
 
@@ -151,19 +152,22 @@ export default {
     padding: 1px 6px 1px 6px;
     padding-inline: 0;
     transition: all 0.2s;
+    cursor: pointer;
 }
 
 .add-button {
-    height: 25px;
+    height: 35px;
     width: 55%;
     border-radius: 4px;
     padding: 1px 4px 1px 4px;
     padding-inline: 0;
+    max-width: 200px;
 }
 
 @media (prefers-color-scheme: light) {
     .item-card {
         border-color: var(--indigo);
+        background-color: var(--pale-grey);
     }
 
     .item-price {

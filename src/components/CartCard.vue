@@ -23,24 +23,26 @@ defineProps({
 </script>
 
 <template>
-    <div class="item-card flex">
-        <img class="item-photo" :src="itemInfo.photo" alt="Photo">
-        <div class="item-info-container flex column">
-            <div class="flex column">
-                <h2 class="item-title">{{ itemInfo.title }}</h2>
-                <div class="flex y-centered">
-                    <div class="remove-icon" @click="removeItems"></div>
-                    <label @click="removeItems">Remove</label>
+    <div class="item-card-wrapper flex x-centered wide">
+        <div class="item-card flex wide">
+            <img class="item-photo" :src="itemInfo.photo" alt="Photo">
+            <div class="item-info-container flex column">
+                <div class="flex column">
+                    <h2 class="item-title">{{ itemInfo.title }}</h2>
+                    <div class="flex y-centered">
+                        <div class="remove-icon" @click="removeItems"></div>
+                        <label @click="removeItems">Remove</label>
+                    </div>
                 </div>
-            </div>
-            <div class="flex y-centered">
-                <label>
-                    <span>{{ cartItemCount.length }} x </span>
-                    <span class="item-price">${{ itemInfo.price.toFixed(2) }}</span>
-                    <span> = </span>
-                    <span class="item-price total">${{ (cartItemCount.length * itemInfo.price.toFixed(2)).toFixed(2)
-                        }}</span>
-                </label>
+                <div class="flex y-centered">
+                    <label>
+                        <span>{{ cartItemCount.length }} x </span>
+                        <span class="item-price">${{ itemInfo.price.toFixed(2) }}</span>
+                        <span> = </span>
+                        <span class="item-price total">${{ (cartItemCount.length * itemInfo.price.toFixed(2)).toFixed(2)
+                            }}</span>
+                    </label>
+                </div>
             </div>
         </div>
     </div>
@@ -64,7 +66,7 @@ export default {
     methods: {
         async removeItems() {
             const that = this;
-            const filteredCart = this.cart.filter(function(element) {
+            const filteredCart = this.cart.filter(function (element) {
                 return element.id !== that.itemInfo.id;
             });
 
@@ -76,18 +78,23 @@ export default {
 </script>
 
 <style scoped>
+.item-card-wrapper {
+    border-bottom: 2px solid var(--pale-tone);
+}
+
 .item-card {
     justify-content: space-between;
     margin: 2px 0 2px 0;
     padding: 3%;
-    border-bottom: 2px solid var(--pale-tone);
     min-height: 160px;
+    max-width: 750px;
 }
 
 .item-photo {
     width: 35%;
+    height: 100%;
     max-width: 200px;
-    max-height: 160px;
+    max-height: 210px;
     border-radius: 4px;
 }
 
@@ -109,7 +116,7 @@ export default {
     margin-right: 4px;
 }
 
-.remove-icon ~ label {
+.remove-icon~label {
     cursor: pointer;
 }
 
@@ -124,7 +131,7 @@ export default {
 }
 
 @media (prefers-color-scheme: light) {
-    .item-card {
+    .item-card-wrapper {
         border-color: var(--indigo);
     }
 

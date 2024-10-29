@@ -2,6 +2,7 @@
 import store from '../store';
 import Panel from '../components/Panel.vue';
 import PanelForm from '../components/PanelForm.vue';
+import TabSelector from '../components/TabSelector.vue';
 
 defineProps({
     itemsList: {
@@ -19,28 +20,11 @@ defineProps({
 
 <template>
     <section class="page-section bordered">
-        <div class="section-selector-container wide">
-            <div class="flex x-centered y-centered wide section-button">
-                <input id="itemsTab" class="hidden" type="radio" name="selected-tab" value="items"
-                    v-model="selectedTab">
-                <label class="flex wide bold x-centered y-centered" for="itemsTab"
-                    :class="{ 'selected': selectedTab === 'items' }">Store items</label>
-            </div>
-            <div class="flex x-centered y-centered wide section-button">
-                <input id="ordersTab" class="hidden" type="radio" name="selected-tab" value="orders"
-                    v-model="selectedTab">
-                <label class="flex wide bold x-centered y-centered" for="ordersTab"
-                    :class="{ 'selected': selectedTab === 'orders' }">Customer orders</label>
-            </div>
-            <div class="flex x-centered y-centered wide section-button">
-                <input id="partnersTab" class="hidden" type="radio" name="selected-tab" value="partners"
-                    v-model="selectedTab">
-                <label class="flex wide bold x-centered y-centered" for="partnersTab"
-                    :class="{ 'selected': selectedTab === 'partners' }">Partner locations</label>
-            </div>
-        </div>
+        <TabSelector :tab-list="adminTabs" @tab-selected="selectTab" />
+
         <div class="tab-container flex wide" v-show="selectedTab === 'orders'">
-            <Panel class="admin-panel" :card-source="ordersList" :panel-type="'order'" @clicked-card="populateOrderForm" />
+            <Panel class="admin-panel" :card-source="ordersList" :panel-type="'order'"
+                @clicked-card="populateOrderForm" />
             <PanelForm class="panel-form" :form-type="'order'" :form-info="orderForm" :items-list="itemsList" />
         </div>
         <div class="tab-container flex wide" v-show="selectedTab === 'items'">
@@ -48,8 +32,10 @@ defineProps({
             <PanelForm class="panel-form" :form-type="'item'" :form-info="itemForm" :items-list="itemsList" />
         </div>
         <div class="tab-container flex wide" v-show="selectedTab === 'partners'">
-            <Panel class="admin-panel" :card-source="partnersList" :panel-type="'item'" @clicked-card="populateItemForm" />
-            <PanelForm class="panel-form" :form-type="'item'" :form-info="partnersForm" :items-list="itemsList" />
+            <Panel class="admin-panel" :card-source="partnersList" :panel-type="'partner'"
+                @clicked-card="populatePartnerForm" />
+            <PanelForm class="panel-form" :form-type="'partner'" :form-info="partnerForm" :items-list="itemsList"
+                :marker-position="[partnerForm.partnerLocation._long, partnerForm.partnerLocation._lat]" @dragged-marker="updatePartnerLocation" />
         </div>
     </section>
 </template>
@@ -58,17 +44,23 @@ defineProps({
 export default {
     name: 'Admin Panel',
     components: {
-        Panel, PanelForm
+        Panel, PanelForm, TabSelector
     },
     data() {
         return {
-            selectedTab: 'orders',
+            selectedTab: 'items',
+            adminTabs: [
+                { identifier: 'items', tabTitle: 'Store items' },
+                { identifier: 'orders', tabTitle: 'Customer orders' },
+                { identifier: 'partners', tabTitle: 'Partner hosts' }
+            ],
             orderForm: {
                 customer: {
                     name: '',
                     email: ''
                 },
                 orderItems: [],
+                orderNotes: '',
                 orderPrice: '',
                 orderStatus: 0,
                 paymentLink: '',
@@ -81,6 +73,18 @@ export default {
                 price: '',
                 shortDescription: '',
                 title: ''
+            },
+            partnerForm: {
+                partnerAddress: '',
+                partnerLocation: {
+                    _lat: -34.60653558169007,
+                    _long: -58.4360043295337
+                },
+                partnerName: '',
+                partnerEmail: '',
+                partnerPhone: '',
+                partnerActivity: true,
+                partnerPrivacy: false
             }
         }
     },
@@ -95,6 +99,18 @@ export default {
         },
         populateItemForm(cardInfo) {
             this.itemForm = cardInfo;
+        },
+        populatePartnerForm(cardInfo) {
+            this.partnerForm = cardInfo;
+        },
+        updatePartnerLocation(newPosition) {
+            this.partnerForm.partnerLocation = {
+                _long: newPosition[1],
+                _lat: newPosition[0]
+            };
+        },
+        selectTab(index) {
+            this.selectedTab = index;
         }
     },
     async beforeCreate() {
@@ -104,29 +120,6 @@ export default {
 </script>
 
 <style scoped>
-.section-selector-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    border-bottom: 2px solid var(--white-soft);
-}
-
-.section-button {
-    height: 60px;
-}
-
-.section-button label {
-    font-size: 22px;
-    letter-spacing: 0.5px;
-    height: 100%;
-    cursor: pointer;
-    transition: background-color 0.25s;
-}
-
-.section-button label.selected {
-    background-color: var(--soft-brown);
-    color: var(--white-soft);
-}
-
 .admin-panel {
     width: 65%;
 }

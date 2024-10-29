@@ -94,7 +94,7 @@ export default {
     cursor: pointer;
     background-image: url("/img/more-white.png");
     background-size: cover;
-    z-index: 3;
+    z-index: 4;
 }
 
 .bar-elements>div.active {
@@ -153,9 +153,9 @@ export default {
     left: 0;
     top: 0;
     width: 50%;
-    max-width: 350px;
+    max-width: 400px;
     height: 100%;
-    z-index: 2;
+    z-index: 3;
 }
 
 .buttons-container-title {

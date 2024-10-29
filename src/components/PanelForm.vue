@@ -1,9 +1,10 @@
 <script setup>
 import store from '../store';
-import { db } from '../firebase/init.js';
-import { doc, updateDoc, setDoc } from "firebase/firestore";
-import { getStorage, getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { db, storage } from '../firebase/init.js';
+import { doc, updateDoc, setDoc, addDoc, deleteDoc, collection, GeoPoint } from "firebase/firestore";
+import { getStorage, getDownloadURL, ref, uploadBytes, deleteObject } from "firebase/storage";
 import { notify } from "@kyvg/vue3-notification";
+import MapboxMap from '../components/MapboxMap.vue';
 
 defineProps({
     formInfo: {
@@ -20,25 +21,40 @@ defineProps({
         type: Array,
         required: false,
         default: store.getters.items
+    },
+    markerPosition: {
+        type: Array,
+        require: false,
+        default: [-58.4360043295337, -34.60653558169007]
     }
 })
 </script>
 
 <template>
     <div class="form-container flex column y-centered">
-        <div class="form-view-container flex column x-centered y-centered" v-if="formType === 'item'">
-            <button class="action-button" :class="{ 'selected': formAdd }" @click="toggleFormAdd">➕</button>
-            <label style="font-size: 13px; margin-top: 1px;">New</label>
+        <div class="form-view-container-left flex column x-centered y-centered" v-if="formType !== 'order'">
+            <button class="action-button corner-button" :class="{ 'disabled': !formInfo.id }"
+                @click="deleteElement">❌</button>
+            <label>Delete</label>
+        </div>
+        <div class="form-view-container-right flex column x-centered y-centered" v-if="formType !== 'order'">
+            <button class="action-button corner-button" :class="{ 'selected': formAdd }"
+                @click="toggleFormAdd">➕</button>
+            <label>New</label>
         </div>
 
         <p class="id-title">
             <span v-if="formType === 'order'">Order</span>
-            <span v-if="formType === 'item'">Item</span>:
+            <span v-if="formType === 'item'">Item</span>
+            <span v-if="formType === 'partner'">Partner</span>:
             <br>
-            <router-link v-if="formType === 'order' && !formAdd" class="bold" :to="'/order/' + formInfo.id">{{ formInfo.id
+            <router-link v-if="formType === 'order' && !formAdd" class="bold" :to="'/order/' + formInfo.id">{{
+                formInfo.id
             }}</router-link>
-            <router-link v-if="formType === 'item' && !formAdd" class="bold" :to="'/store/' + formInfo.id">{{ formInfo.id
+            <router-link v-if="formType === 'item' && !formAdd" class="bold" :to="'/store/' + formInfo.id">{{
+                formInfo.id
             }}</router-link>
+            <p v-if="formType === 'partner' && !formAdd" class="bold" style="margin-bottom: 0;">{{ formInfo.id }}</p>
             <span v-if="formAdd">New ID will be generated.</span>
         </p>
 
@@ -53,6 +69,10 @@ defineProps({
                     </select>
                 </label>
             </div>
+            <label class="flex column wide y-centered top-margin">
+                Internal notes:
+                <textarea rows="6" class="field-textarea" name="orderNotes" v-model="formInfo.orderNotes"></textarea>
+            </label>
             <p class="form-subtitle bold">Items included:</p>
             <div class="flex column">
                 <p class="item-count" v-for="(item, i) in differentItemsInCart" :key="i">
@@ -65,7 +85,7 @@ defineProps({
                     <option value="usd">USD</option>
                     <option value="ars">ARS</option>
                 </select>
-                <input v-model="formInfo.orderPrice" id="orderPrice" class="form-field number" type="number">
+                <input v-model="formInfo.orderPrice" id="orderPrice" class="form-field number" type="number" step=".01">
             </label>
             <p class="form-subtitle bold">Customer info:</p>
             <div class="flex column y-centered">
@@ -89,7 +109,8 @@ defineProps({
                 value="Update order">
         </form>
 
-        <form class="flex column wide" v-if="formType === 'item'" @submit.prevent="formAdd ? createItem() : updateItem()">
+        <form class="flex column wide" v-if="formType === 'item'"
+            @submit.prevent="formAdd ? createItem() : updateItem()">
             <label class="flex wide x-centered bottom-margin" for="itemTitle">
                 Title:&nbsp;
                 <input v-model="formInfo.title" id="itemTitle" class="form-field" type="text">
@@ -102,24 +123,55 @@ defineProps({
                     v-model="formInfo.price" id="itemPrice" class="form-field number" type="number" step=".01"></label>
             <label class="flex column wide y-centered">
                 Short description:
-                <textarea rows="3" class="item-textarea" name="shortDescription"
+                <textarea rows="3" class="field-textarea" name="shortDescription"
                     v-model="formInfo.shortDescription"></textarea>
             </label>
             <label class="flex column wide y-centered top-margin bottom-margin">
                 Long description:
-                <textarea rows="6" class="item-textarea" name="longDescription"
+                <textarea rows="6" class="field-textarea" name="longDescription"
                     v-model="formInfo.longDescription"></textarea>
             </label>
             <label class="flex wide x-centered" for="itemAvailability">
-                <input id="itemAvailability" type="checkbox" v-model="formInfo.available">
+                <input id="itemAvailability" type="checkbox" v-model="formInfo.itemAvailability">
                 Available
             </label>
-            <input type="submit" class="submit-button action-button large" :class="{ 'disabled': !formInfo.id && !formAdd }"
-                :value="formAdd ? 'Add new item' : 'Update item'">
+            <input type="submit" class="submit-button action-button large"
+                :class="{ 'disabled': !formInfo.id && !formAdd }" :value="formAdd ? 'Add new item' : 'Update item'">
         </form>
 
-        <form class="flex column wide" v-if="formType === 'item'" @submit.prevent="formAdd ? createPartner : updatePartner">
+        <form class="flex column wide" v-if="formType === 'partner'"
+            @submit.prevent="formAdd ? createPartner() : updatePartner">
+            <div class="flex column y-centered">
+                <p class="bold">Property:</p>
+                <label class="field-label flex x-centered" for="partnerPropertyName">Name:&nbsp;<input
+                    v-model="formInfo.partnerPropertyName" id="partnerPropertyName" class="form-field" type="text"></label>
+                <label class="flex x-centered bottom-margin" for="partnerAddress">Address:&nbsp;<input
+                    v-model="formInfo.partnerAddress" id="partnerAddress" class="form-field" type="text"></label>
+                <MapboxMap :height="'40vh'" :width="'90%'" :mode="'picker'" :marker-position="markerPosition" @dragged-marker="draggedMarker" />
+            </div>
+            <p class="form-subtitle bold">Owner's contact:</p>
+            <div class="flex column y-centered">
+                <label for="partnerName" class="field-label flex x-centered wide">Name:&nbsp;<input
+                        v-model="formInfo.partnerName" id="partnerName" class="form-field" type="text"></label>
+                <label for="partnerEmail" class="field-label flex x-centered wide">Email:&nbsp;<input
+                        v-model="formInfo.partnerEmail" id="partnerEmail" class="form-field" type="email"></label>
+                <label for="partnerPhone" class="field-label flex x-centered wide">Phone:&nbsp;<input
+                        v-model="formInfo.partnerPhone" id="partnerPhone" class="form-field" type="tel"></label>
+            </div>
+            <div class="flex x-centered top-margin space-evenly">
+                <label class="flex x-centered" for="partnerActivity">
+                    <input id="partnerActivity" type="checkbox" v-model="formInfo.partnerActivity">
+                    Active
+                </label>
+                <label class="flex x-centered" for="partnerPrivacy">
+                    <input id="partnerPrivacy" type="checkbox" v-model="formInfo.partnerPrivacy">
+                    Private
+                </label>
+            </div>
 
+            <input type="submit" class="submit-button action-button large"
+                :class="{ 'disabled': !formInfo.id && !formAdd }"
+                :value="formAdd ? 'Add new partner' : 'Update partner'">
         </form>
     </div>
 </template>
@@ -127,6 +179,9 @@ defineProps({
 <script>
 export default {
     name: 'Panel Form',
+    components: {
+        MapboxMap
+    },
     data() {
         return {
             photoSource: '',
@@ -163,7 +218,7 @@ export default {
             const itemRef = doc(db, "items", this.formInfo.id);
 
             await updateDoc(itemRef, {
-                available: that.formInfo.available,
+                itemAvailability: that.formInfo.itemAvailability,
                 longDescription: that.formInfo.longDescription,
                 price: that.formInfo.price,
                 shortDescription: that.formInfo.shortDescription,
@@ -193,7 +248,7 @@ export default {
             this.uploadPhoto(autoID, 'items', function (fileName) {
                 that.generatePhotoReference(fileName, 'items', async function (photoReference) {
                     await setDoc(doc(db, "items", autoID), {
-                        available: that.formInfo.available,
+                        itemAvailability: that.formInfo.itemAvailability,
                         longDescription: that.formInfo.longDescription,
                         photo: photoReference,
                         price: that.formInfo.price,
@@ -205,6 +260,19 @@ export default {
                 });
             });
         },
+        async createPartner() {
+            await addDoc(collection(db, "partners"), {
+                partnerAddress: this.formInfo.partnerAddress,
+                partnerLocation: new GeoPoint(this.markerPosition[1], this.markerPosition[0]),
+                partnerName: this.formInfo.partnerName,
+                partnerEmail: this.formInfo.partnerEmail,
+                partnerPhone: this.formInfo.partnerPhone,
+                partnerActivity: this.formInfo.partnerActivity,
+                partnerPrivacy: this.formInfo.partnerPrivacy
+            });
+
+            this.addNotification();
+        },
         async updateOrder() {
             const orderRef = doc(db, "orders", this.formInfo.id);
 
@@ -214,6 +282,7 @@ export default {
                     name: this.formInfo.customer.name
                 },
                 orderItems: this.formInfo.orderItems,
+                orderNotes: this.formInfo.orderNotes,
                 orderPrice: this.formInfo.orderPrice,
                 orderStatus: Number(this.formInfo.orderStatus),
                 paymentLink: this.formInfo.paymentLink,
@@ -250,9 +319,37 @@ export default {
         toggleFormAdd() {
             this.formAdd = !this.formAdd;
         },
+        async deleteElement() {
+            const that = this;
+
+            if (confirm("This will permanently delete the entry and everything related to it. Do you want to proceed?")) {
+                await deleteDoc(doc(db, `${this.formType}s`, this.formInfo.id));
+                const photoRef = ref(storage, "images/" + `${this.formType}s` + "/" + this.formInfo.id + ".png");
+                deleteObject(photoRef).then(() => {
+                    remoteDirectory.splice(entryIndex, 1);
+                    that.deleteNotification();
+                }).catch((error) => {
+                    notify({
+                        title: 'Element deletion',
+                        text: error,
+                        type: 'error'
+                    })
+                });
+            }
+        },
+        draggedMarker(newPosition) {
+            this.$emit('dragged-marker', newPosition);
+        },
         generateFirestoreId() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
             return Array.from(crypto.getRandomValues(new Uint8Array(20))).map(b => chars[b % chars.length]).join('');
+        },
+        deleteNotification() {
+            notify({
+                title: 'Element deletion',
+                text: 'The element was successfully deleted from the database.',
+                type: 'success'
+            });
         },
         updateNotification() {
             notify({
@@ -285,10 +382,26 @@ export default {
     padding: 15px;
 }
 
-.form-view-container {
+.form-view-container-left {
+    position: absolute;
+    left: 5px;
+    top: 5px;
+}
+
+.form-view-container-right {
     position: absolute;
     right: 5px;
     top: 5px;
+}
+
+.corner-button {
+    height: 29px;
+    padding: 2px;
+}
+
+.corner-button~label {
+    font-size: 11px;
+    margin-top: 1px;
 }
 
 .action-button {
@@ -352,7 +465,7 @@ div>.item-count:last-of-type {
     margin-bottom: 8px;
 }
 
-.item-textarea {
+.field-textarea {
     width: 70%;
     overflow-y: scroll;
 }

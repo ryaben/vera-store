@@ -23,8 +23,10 @@ defineProps({
         <p class="id-title">
             <span v-if="cardType === 'order'">ID:&nbsp;</span>
             <span v-if="cardType === 'item'">Title:&nbsp;</span>
+            <span v-if="cardType === 'partner'">Address:&nbsp;</span>
             <span v-if="cardType === 'order'" class="bold colored">{{ cardInfo.id }}</span>
             <span v-if="cardType === 'item'" class="bold colored">{{ cardInfo.title }}</span>
+            <span v-if="cardType === 'partner'" class="bold colored">{{ cardInfo.partnerAddress }}</span>
         </p>
     </div>
 </template>

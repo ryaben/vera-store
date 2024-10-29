@@ -53,8 +53,8 @@ export default {
 
 .item-photo {
     width: 70%;
-    max-width: 25vw;
-    max-height: 35vh;
+    max-width: 400px;
+    max-height: 50vh;
     margin-bottom: 20px;
 }
 

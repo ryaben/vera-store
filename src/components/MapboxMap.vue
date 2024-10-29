@@ -1,7 +1,6 @@
 <script setup>
-import { MapboxMap, MapboxMarker, MapboxNavigationControl } from '@studiometa/vue-mapbox-gl';
+import { MapboxMap, MapboxMarker, MapboxNavigationControl, MapboxGeolocateControl } from '@studiometa/vue-mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import MemberSource from './MemberSource.vue';
 
 const mapboxToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
@@ -9,7 +8,7 @@ defineProps({
     visible: {
         type: Boolean,
         required: false,
-        default: false
+        default: true
     },
     width: {
         type: String,
@@ -30,58 +29,65 @@ defineProps({
         type: Array,
         require: false,
         default: []
+    },
+    markerPosition: {
+        type: Array,
+        require: false,
+        default: [-58.4360043295337, -34.60653558169007]
     }
 });
 </script>
 
 <template>
-    <div class="mapbox-container" :style="visible ? 'display: none;' : 'display: flex;'">
-        <MapboxMap :style="{ 'height': height, 'width': width }" :access-token="mapboxToken" ref="mapbox"
-            map-style="mapbox://styles/ramayaben/clldsj3t701e101mf8buwfsad"
+    <div class="mapbox-container" :style="{ 'height': height, 'width': width }" :class="{ 'hidden': !visible }">
+        <MapboxMap :style="{ 'width': '100%', 'height': 'auto' }" :access-token="mapboxToken" ref="mapbox"
+            map-style="mapbox://styles/ramayaben/cm2c8ni72001l01ql451q8xoc"
             @mb-created="(mapboxInstance) => map = mapboxInstance">
-            <MapboxMarker v-if="mode === 'picker'" id="mapboxMarker" :lng-lat="markerPosition" popup draggable
-                @mb-dragend="updatePosition">
+
+            <MapboxMarker v-if="mode === 'picker'" id="mapboxMarker" :color="'#000'" :lng-lat="markerPosition" popup
+                draggable @mb-dragend="updatePosition">
                 <template v-slot:popup>
-                    <p style="color: black; font-size: 12px; text-align: center;">The micronation (or its founder) are
-                        based here.
+                    <p style="color: black; font-size: 12px; text-align: center;">Partner's property location.
                     </p>
                 </template>
             </MapboxMarker>
 
             <MapboxMarker v-if="mode === 'locationMap'" v-for="(marker, i) in collection" :key="i"
-                class="micronation-marker" :lng-lat="[marker.location.longitude, marker.location.latitude]" popup>
+                :lng-lat="[marker.partnerLocation.longitude, marker.partnerLocation.latitude]" :color="'#000'" popup>
                 <template v-slot:popup>
-                    <p class="custom-marker" style="color: black; font-size: 12px; text-align: center;">
-                        {{ marker.name.main }}<span v-if="marker.name.title">,</span> {{ marker.name.title }}
-                    </p>
-                    <MemberSource class="member-source" style="margin: 0 auto 0 auto; border: 1px solid black;"
-                        :href="`/directory/${marker.name.main}`" :flag-source="marker.flag" :width="60" :height="40"
-                        :icon="'flag'" />
+                    <p class="marker-name">{{ marker.partnerPropertyName }}</p>
+                    <p class="marker-address">{{ marker.partnerAddress }}</p>
+                    <div v-if="selectedHost !== i" class="action-button flex x-centered" @click="selectHost(i, marker.id)">Select</div>
+                    <label v-if="selectedHost === i" class="selected bold positive-text">✅ Selected</label>
                 </template>
             </MapboxMarker>
 
             <MapboxNavigationControl position="bottom-right" />
+            <MapboxGeolocateControl position="top-right" />
         </MapboxMap>
     </div>
 </template>
 
 <script>
 export default {
-    name: 'LocationPicker',
+    name: 'MapboxMap',
     components: {
-        MemberSource
+
     },
     data: () => {
         return {
             layerOptions: {},
-            markerPosition: [0, 0]
+            selectedHost: undefined
         };
     },
     methods: {
         updatePosition(e) {
-            this.markerPosition = [e.target._lngLat.lng, e.target._lngLat.lat];
-            this.$emit('dragged-marker', this.markerPosition);
+            this.$emit('dragged-marker', [e.target._lngLat.lat, e.target._lngLat.lng]);
         },
+        selectHost(index, markerID) {
+            this.selectedHost = index;
+            this.$emit('host-selected', markerID);
+        }
     }
 }
 </script>
@@ -90,5 +96,31 @@ export default {
 .mapbox-container {
     display: flex;
     justify-content: center;
+    min-width: 330px;
+    max-width: 700px;
+    border: 1px solid var(--white);
+    border-radius: 1px;
+}
+
+.mapbox-container.hidden {
+    display: none;
+}
+
+.marker-name {}
+
+.marker-address {
+    color: var(--black);
+    font-size: 12px;
+    text-align: center;
+}
+
+label.selected {
+    font-size: 14px;
+}
+
+@media (prefers-color-scheme: light) {
+    .mapbox-container {
+        border-color: var(--black);
+    }
 }
 </style>

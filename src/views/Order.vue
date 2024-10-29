@@ -15,7 +15,7 @@ defineProps({
 
 <template>
     <section class="page-section">
-        <div class="flex column y-centered" v-if="!ordersList.length && !orderData">
+        <div class="flex column y-centered wide" v-if="!ordersList.length && !orderData">
             <img class="loading-image" src="/img/loading.gif" alt="Loading">
             <p>Loading data...</p>
         </div>
@@ -195,10 +195,11 @@ export default {
     font-size: 14px;
     margin-bottom: 25px;
     width: 90%;
+    text-align: center;
 }
 
 .payment-data p {
-    text-align: left;
+    text-align: center;
     width: max-content;
 }
 

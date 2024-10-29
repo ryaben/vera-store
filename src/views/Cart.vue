@@ -17,22 +17,25 @@ defineProps({
                 items</router-link> to start an order.</p>
         <p v-if="cartList.length">These are the items included in your order:</p>
 
-        <div class="flex column wide">
-            <TransitionGroup name="fade">
-                <CartCard v-for="(cartItem, i) in differentItemsInCart" :key="i" :item-info="cartItem"
-                    :cart="cartList" />
-            </TransitionGroup>
+        <div class="flex column wide y-centered">
+            <CartCard v-for="(cartItem, i) in differentItemsInCart" :key="i" :item-info="cartItem" :cart="cartList" />
         </div>
 
-        <div class="flex column wide">
-            <p v-if="cartList.length" id="cartTotal">Total: <span class="total-price">${{ cartTotal.toFixed(2) }}</span>
+        <div class="flex column wide" v-if="cartList.length">
+            <p id="cartTotal">Total: <span class="total-price">${{ cartTotal.toFixed(2) }}</span>
             </p>
+            <div class="flex right y-centered">
+                <label for="couponCode" class="flex right">Coupon:</label>
+                <input type="text" id="couponCode" placeholder="Enter code...">
+                <button class="action-button">Redeem</button>
+            </div>
         </div>
 
-        <div v-if="cartList.length" class="buttons-container flex wide space-between" style="margin-bottom: 25px;">
+        <div v-if="cartList.length" class="buttons-container flex wide space-evenly" style="margin-bottom: 25px;">
             <button class="action-button large red" @click="clearCart">Clear cart</button>
             <button class="action-button large flex y-centered x-centered">
-                <router-link class="flex wide tall x-centered y-centered" :to="{ name: 'Checkout' }">Checkout</router-link>
+                <router-link class="flex wide tall x-centered y-centered"
+                    :to="{ name: 'Checkout' }">Checkout</router-link>
             </button>
         </div>
     </section>
@@ -83,7 +86,7 @@ export default {
 <style scoped>
 #cartTotal {
     font-size: 22px;
-    margin: 4px 4px 0px auto;
+    margin: 4px 4px 10px auto;
 }
 
 #cartTotal .total-price {
@@ -91,8 +94,19 @@ export default {
     color: var(--soft-brown);
 }
 
+#cartTotal .total-price.discounted {
+    text-decoration: line-through;
+    opacity: 70%;
+}
+
 .buttons-container {
-    margin-top: 40px;
+    margin-top: 35px;
+}
+
+#couponCode {
+    width: 35%;
+    max-width: 300px;
+    margin: auto 5px auto 5px;
 }
 
 @media (prefers-color-scheme: light) {}

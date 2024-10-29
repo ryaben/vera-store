@@ -5,6 +5,8 @@ import AnimateHeight from 'vue-animate-height';
 import { db } from '../firebase/init.js';
 import { collection, addDoc } from "firebase/firestore";
 import Recaptcha from '../components/ReCaptcha.vue';
+import MapboxMap from '../components/MapboxMap.vue';
+import { notify } from "@kyvg/vue3-notification";
 
 defineProps({
     cartList: {
@@ -16,6 +18,11 @@ defineProps({
         type: Array,
         required: false,
         default: store.getters.orders
+    },
+    partnersList: {
+        type: Array,
+        required: false,
+        default: store.getters.partners
     }
 });
 </script>
@@ -37,6 +44,17 @@ defineProps({
                 <input type="email" id="checkoutFormEmail" required placeholder="john.doe@email.com"
                     v-model="customerEmail">
             </div>
+            <div class="form-field flex column y-centered">
+                <label>Host location</label>
+                <p>Selected:
+                    <span v-if="!selectedHost">None.</span>
+                    <span v-if="selectedHost" class="bold">
+                        {{ selectedHostAddress }}
+                    </span>
+                </p>
+                <MapboxMap :height="'40vh'" :width="'80%'" :mode="'locationMap'" :collection="partnersList"
+                    @host-selected="selectHost" />
+            </div>
             <div class="purchase-overview flex space-between">
                 <p>{{ cartList.length }} items</p>
                 <div class="flex" style="margin: auto;">
@@ -45,18 +63,19 @@ defineProps({
                         <option v-if="paymentMethod === 'cash'" value="ars">ARS</option>
                     </select>
                     <p v-if="orderCurrency === 'usd'" class="total-price">{{ cartTotal.toFixed(2) }}</p>
-                    <p v-if="orderCurrency === 'ars'" class="total-price">{{ (cartTotal * blueDollarRate).toFixed(2) }}</p>
+                    <p v-if="orderCurrency === 'ars'" class="total-price">{{ (cartTotal * blueDollarRate).toFixed(2) }}
+                    </p>
                 </div>
             </div>
             <div class="flex column wide" style="margin-bottom: 20px;">
                 <div class="flex y-centered">
-                    <input id="methodCash" type="radio" name="payment-method" value="cash" @change="updateHeight(); updateCurrencyToUSD()"
-                        v-model="paymentMethod">
+                    <input id="methodCash" type="radio" name="payment-method" value="cash"
+                        @change="updateHeight(); updateCurrencyToUSD()" v-model="paymentMethod">
                     <label for="methodCash">Cash (USD or Argentinean Peso)</label>
                 </div>
                 <div class="flex y-centered">
-                    <input id="methodCard" type="radio" name="payment-method" value="card" @change="updateHeight(); updateCurrencyToUSD()"
-                        v-model="paymentMethod">
+                    <input id="methodCard" type="radio" name="payment-method" value="card"
+                        @change="updateHeight(); updateCurrencyToUSD()" v-model="paymentMethod">
                     <label for="methodCard">Credit/debit card, bank transfer</label>
                 </div>
             </div>
@@ -64,7 +83,8 @@ defineProps({
                 <p id="cartNotice" class="negative-text" v-show="cartTotal < 20">
                     Minimum amount of <b>$20</b> not reached. This is a threshold that Payoneer imposes for payment
                     requests.
-                    You can instead either choose 'Cash' as payment method, or <router-link :to="{ name: 'Store' }">add more
+                    You can instead either choose 'Cash' as payment method, or <router-link :to="{ name: 'Store' }">add
+                        more
                         items to the order</router-link>.
                 </p>
                 <p class="form-note">
@@ -79,7 +99,7 @@ defineProps({
                 </p>
             </AnimateHeight>
             <Recaptcha class="order-recaptcha flex x-centered" @checkbox="checkRecaptcha" />
-            <div class="flex wide space-between" style="margin-bottom: 20px;">
+            <div class="flex wide space-evenly" style="margin-bottom: 20px;">
                 <button class="action-button large red flex y-centered x-centered">
                     <router-link class="flex wide tall x-centered y-centered" :to="{ name: 'Cart' }">Back to
                         cart</router-link>
@@ -106,7 +126,8 @@ export default {
             paymentMethod: 'cash',
             processingOrder: false,
             passedRecaptcha: false,
-            orderCurrency: 'usd'
+            orderCurrency: 'usd',
+            selectedHost: undefined
         }
     },
     computed: {
@@ -118,6 +139,10 @@ export default {
             });
 
             return totalValue;
+        },
+        selectedHostAddress() {
+            const that = this;
+            return this.partnersList.find(el => { return el.id === that.selectedHost }).partnerAddress;
         }
     },
     methods: {
@@ -128,6 +153,10 @@ export default {
             this.orderCurrency = 'usd';
         },
         async issueOrder() {
+            if (!this.selectedHost) {
+                return this.missingHostNotification();
+            }
+
             this.processingOrder = true;
 
             const docRef = await addDoc(collection(db, "orders"), {
@@ -144,10 +173,28 @@ export default {
 
             await store.dispatch("clearCart");
             this.processingOrder = false;
+            this.orderCreationNotification(docRef.id);
             this.$router.push({ name: 'Order', params: { orderID: docRef.id } });
         },
         async checkRecaptcha(value) {
             this.passedRecaptcha = value;
+        },
+        orderCreationNotification(orderID) {
+            notify({
+                title: "Order successfully created",
+                text: `We got your order with ID ${orderID}! We've sent you an email containing the link to this order page.`,
+                type: "success"
+            });
+        },
+        missingHostNotification() {
+            notify({
+                title: "No host selected",
+                text: `Please, select the place where you are staying at so we can deliver the package at your location.`,
+                type: "error"
+            });
+        },
+        selectHost(markerID) {
+            this.selectedHost = markerID;
         }
     },
     mounted() {
@@ -174,6 +221,7 @@ export default {
 
 .form-field input {
     width: 70%;
+    max-width: 500px;
 }
 
 .purchase-overview {
