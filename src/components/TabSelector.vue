@@ -16,7 +16,7 @@ defineProps({
 </script>
 
 <template>
-    <div class="section-selector-container wide">
+    <div class="section-selector-container wide" :style="{'grid-template-columns': `repeat(${tabList.length}, 1fr)`}">
         <div v-for="(tab, i) in tabList" :key="i" class="flex x-centered y-centered wide section-button" @click="selectTab(tab.identifier)">
             <input :id="`${tab.identifier}Tab`" class="hidden" type="radio" name="selected-tab" :value="tab.identifier"
                 v-model="selectedTab">
@@ -49,7 +49,6 @@ export default {
 <style scoped>
 .section-selector-container {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
     border-bottom: 2px solid var(--white-soft);
 }
 
@@ -64,6 +63,8 @@ export default {
     cursor: pointer;
     transition: background-color 0.25s;
     text-align: center;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
 }
 
 .section-button label.selected {
@@ -73,11 +74,15 @@ export default {
 
 @media only screen and (max-width: 500px) {
     .section-button label {
-        font-size: 15px;
+        font-size: 14px;
     }
 }
 
 @media (prefers-color-scheme: light) {
+    .section-selector-container {
+        border-color: var(--black-soft);
+    }
+
     .card-container {
         border-color: var(--black-soft);
     }

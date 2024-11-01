@@ -7,19 +7,20 @@ defineProps({
         required: true,
         default: []
     },
-    panelType: {
-        type: String,
-        required: false,
-        default: 'order'
-    },
 })
 </script>
 
 <template>
     <div class="panel-container flex">
+        <div class="flex wide bottom-margin">
+            <label>Display by:&nbsp;</label>
+            <select v-model="displayParameter">
+                <option v-for="(parameter, i) in parameterOptions" :key="i" :value="parameter">{{ parameter }}</option>
+            </select>
+        </div>
         <PanelCard class="panel-card" :class="{ 'selected': selectedIndex === i }" v-for="(element, i) in cardSource"
-            :key="i" :card-index="i" :card-type="panelType" :card-info="element" @clicked-card="exportData"
-            @updated-index="updateSelectedCard" />
+            :key="i" :card-index="i" :display-parameter="displayParameter" :card-info="element"
+            @clicked-card="exportData" @updated-index="updateSelectedCard" />
     </div>
 </template>
 
@@ -29,9 +30,17 @@ export default {
     components: {
         PanelCard
     },
+    emits: ["clicked-card"],
     data() {
         return {
-            selectedIndex: undefined
+            selectedIndex: undefined,
+            parameterOptions: [],
+            displayParameter: ""
+        }
+    },
+    watch: {
+        cardSource(newValue) {
+            if (newValue.length) this.createParameterOptions(newValue[0]);
         }
     },
     methods: {
@@ -40,6 +49,10 @@ export default {
         },
         updateSelectedCard(index) {
             this.selectedIndex = index;
+        },
+        createParameterOptions(card) {
+            this.parameterOptions = Object.keys(card);
+            this.displayParameter = this.parameterOptions[0];
         }
     }
 }
@@ -59,6 +72,7 @@ export default {
 
 .panel-card.selected {
     background-color: var(--intense-brown);
+    color: var(--dimmed-brown);
     transition: background-color 0.25s;
 }
 

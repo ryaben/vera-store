@@ -25,7 +25,7 @@ defineProps({
 <template>
     <div class="item-card flex">
         <img class="item-photo" :src="itemInfo.photo" alt="Photo">
-        <div class="item-info-container flex column">
+        <div class="item-info-container flex column wide">
             <div class="flex column">
                 <h2 class="item-title">{{ itemInfo.title }}</h2>
                 <p class="item-short-description">{{ itemInfo.shortDescription }} <router-link
@@ -36,14 +36,14 @@ defineProps({
             </div>
             <div class="flex y-centered space-between">
                 <div class="quantity-container flex">
-                    <button class="change-quantity-button flex column y-centered" @click="changeCartQuantity(-1)"
+                    <button class="change-quantity-button centered-text" @click="changeCartQuantity(-1)"
                         :class="{ 'disabled': cartQuantity <= 1 }">-</button>
                     <input class="cart-quantity" type="number" v-model="cartQuantity" min="1" max="20">
-                    <button class="change-quantity-button flex column y-centered" @click="changeCartQuantity(1)"
+                    <button class="change-quantity-button" @click="changeCartQuantity(1)"
                         :class="{ 'disabled': cartQuantity >= 20 }">+</button>
                 </div>
                 <button class="action-button add-button" :class="{ 'disabled': !itemInfo.itemAvailability }"
-                    @click="addToCart">Add to cart</button>
+                    @click="addToCart(); animateAdd($event)">Add to cart</button>
             </div>
         </div>
     </div>
@@ -69,6 +69,16 @@ export default {
             }
 
             store.dispatch("addToCart", { addedToCart: addedItems });
+        },
+        animateAdd(event) {
+            event.target.classList.add("disabled");
+            event.target.classList.add("added");
+            event.target.innerText = "Added!";
+            setTimeout(() => {
+                event.target.classList.remove("disabled");
+                event.target.classList.remove("added");
+                event.target.innerText = "Add to cart";
+            }, 1500);
         }
     }
 }
@@ -76,7 +86,7 @@ export default {
 
 <style scoped>
 .item-card {
-    justify-content: space-between;
+    justify-content: left;
     margin: 4px 0 4px 0;
     padding: 3%;
     border: 2px solid var(--pale-tone);
@@ -87,14 +97,14 @@ export default {
 
 .item-photo {
     width: 35%;
-    max-width: 200px;
+    max-width: 160px;
     max-height: 140px;
     border-radius: 4px;
 }
 
 .item-info-container {
     justify-content: space-between;
-    width: 60%;
+    margin-left: 5%;
 }
 
 .item-title {
@@ -132,6 +142,8 @@ export default {
     min-width: 15px;
     margin: 0 5% 0 5%;
     -moz-appearance: textfield;
+    padding-block: 0;
+    padding-inline: 5px;
 }
 
 .cart-quantity::-webkit-outer-spin-button,
@@ -142,7 +154,8 @@ export default {
 
 .change-quantity-button {
     width: 27%;
-    max-width: 40px;
+    min-width: 22px;
+    max-width: 45px;
     border-radius: 6px;
     font-weight: bold;
     font-size: 21px;
@@ -150,18 +163,26 @@ export default {
     background-color: var(--soft-brown);
     color: var(--pale-tone);
     padding: 1px 6px 1px 6px;
-    padding-inline: 0;
+    padding-inline: 1px;
+    padding-block: 1px;
     transition: all 0.2s;
     cursor: pointer;
+    
 }
 
 .add-button {
     height: 35px;
-    width: 55%;
+    width: 50%;
     border-radius: 4px;
     padding: 1px 4px 1px 4px;
     padding-inline: 0;
     max-width: 200px;
+    transition: all 0.2s;
+}
+
+.add-button.added {
+    background: var(--success-tone);
+    color: var(--white);
 }
 
 @media (prefers-color-scheme: light) {

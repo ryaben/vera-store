@@ -96,7 +96,7 @@ export default {
 .mapbox-container {
     display: flex;
     justify-content: center;
-    min-width: 330px;
+    min-width: 240px;
     max-width: 700px;
     border: 1px solid var(--white);
     border-radius: 1px;

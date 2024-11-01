@@ -5,6 +5,7 @@ import { doc, updateDoc, setDoc, addDoc, deleteDoc, collection, GeoPoint } from 
 import { getStorage, getDownloadURL, ref, uploadBytes, deleteObject } from "firebase/storage";
 import { notify } from "@kyvg/vue3-notification";
 import MapboxMap from '../components/MapboxMap.vue';
+import SelectedValue from './SelectedValue.vue';
 
 defineProps({
     formInfo: {
@@ -50,12 +51,12 @@ defineProps({
             <br>
             <router-link v-if="formType === 'order' && !formAdd" class="bold" :to="'/order/' + formInfo.id">{{
                 formInfo.id
-            }}</router-link>
+                }}</router-link>
             <router-link v-if="formType === 'item' && !formAdd" class="bold" :to="'/store/' + formInfo.id">{{
                 formInfo.id
-            }}</router-link>
-            <p v-if="formType === 'partner' && !formAdd" class="bold" style="margin-bottom: 0;">{{ formInfo.id }}</p>
-            <span v-if="formAdd">New ID will be generated.</span>
+                }}</router-link>
+        <p v-if="formType === 'partner' && !formAdd" class="bold" style="margin-bottom: 0;">{{ formInfo.id }}</p>
+        <span v-if="formAdd">New ID will be generated.</span>
         </p>
 
         <form class="flex column wide" v-if="formType === 'order'" @submit.prevent="updateOrder">
@@ -120,7 +121,20 @@ defineProps({
                 <input id="photoFile" type="file" @input="previewImage" accept="image/png">
             </div>
             <label class="flex x-centered top-margin bottom-margin" for="itemPrice">Price:&nbsp;<input
-                    v-model="formInfo.price" id="itemPrice" class="form-field number" type="number" step=".01"></label>
+                    v-model="formInfo.price" id="itemPrice" class="form-field number" type="number" step=".01">
+            </label>
+            <label class="flex column wide y-centered bottom-margin">
+                Categories:
+                <div class="flex">
+                    <input type="text" v-model="categoryValue" placeholder="Input a category for the item">
+                    <div class="action-button flex x-centered y-centered" style="margin-left: 10px;"
+                        @click.native.stop="addValue(categoryValue, formInfo.itemCategories)">Add</div>
+                </div>
+                <div class="flex">
+                    <SelectedValue class="selection margin-top" v-for="(value, i) in formInfo.itemCategories" :key="i"
+                        :lang-text="value" @remove-value="removeValue(value, formInfo.itemCategories)" />
+                </div>
+            </label>
             <label class="flex column wide y-centered">
                 Short description:
                 <textarea rows="3" class="field-textarea" name="shortDescription"
@@ -144,10 +158,12 @@ defineProps({
             <div class="flex column y-centered">
                 <p class="bold">Property:</p>
                 <label class="field-label flex x-centered" for="partnerPropertyName">Name:&nbsp;<input
-                    v-model="formInfo.partnerPropertyName" id="partnerPropertyName" class="form-field" type="text"></label>
+                        v-model="formInfo.partnerPropertyName" id="partnerPropertyName" class="form-field"
+                        type="text"></label>
                 <label class="flex x-centered bottom-margin" for="partnerAddress">Address:&nbsp;<input
-                    v-model="formInfo.partnerAddress" id="partnerAddress" class="form-field" type="text"></label>
-                <MapboxMap :height="'40vh'" :width="'90%'" :mode="'picker'" :marker-position="markerPosition" @dragged-marker="draggedMarker" />
+                        v-model="formInfo.partnerAddress" id="partnerAddress" class="form-field" type="text"></label>
+                <MapboxMap :height="'40vh'" :width="'90%'" :mode="'picker'" :marker-position="markerPosition"
+                    @dragged-marker="draggedMarker" />
             </div>
             <p class="form-subtitle bold">Owner's contact:</p>
             <div class="flex column y-centered">
@@ -180,11 +196,12 @@ defineProps({
 export default {
     name: 'Panel Form',
     components: {
-        MapboxMap
+        MapboxMap, SelectedValue
     },
     data() {
         return {
             photoSource: '',
+            categoryValue: "",
             formAdd: false
         }
     },
@@ -219,6 +236,7 @@ export default {
 
             await updateDoc(itemRef, {
                 itemAvailability: that.formInfo.itemAvailability,
+                itemCategories: that.formInfo.itemCategories,
                 longDescription: that.formInfo.longDescription,
                 price: that.formInfo.price,
                 shortDescription: that.formInfo.shortDescription,
@@ -248,7 +266,9 @@ export default {
             this.uploadPhoto(autoID, 'items', function (fileName) {
                 that.generatePhotoReference(fileName, 'items', async function (photoReference) {
                     await setDoc(doc(db, "items", autoID), {
+                        itemPurchases: 0,
                         itemAvailability: that.formInfo.itemAvailability,
+                        itemCategories: that.formInfo.itemCategories,
                         longDescription: that.formInfo.longDescription,
                         photo: photoReference,
                         price: that.formInfo.price,
@@ -343,6 +363,14 @@ export default {
         generateFirestoreId() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
             return Array.from(crypto.getRandomValues(new Uint8Array(20))).map(b => chars[b % chars.length]).join('');
+        },
+        addValue(value, array) {
+            if (array.find(e => e === value) === undefined) {
+                array.push(value);
+            }
+        },
+        removeValue(value, array) {
+            array.splice(array.indexOf(value), 1);
         },
         deleteNotification() {
             notify({

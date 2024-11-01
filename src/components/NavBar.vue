@@ -1,4 +1,6 @@
 <script setup>
+import NavbarButton from './NavbarButton.vue';
+
 defineProps({
     logo: {
         type: String,
@@ -16,6 +18,13 @@ defineProps({
         type: Number,
         required: true,
         default: 0
+    },
+    buttons: {
+        type: Array,
+        required: true,
+        default: [{
+            text: "Home", icon: "home.png", route: "Home", subButtons: []
+        }]
     }
 })
 </script>
@@ -23,16 +32,12 @@ defineProps({
 <template>
     <nav class="navbar flex column">
         <div class="bar-elements flex">
-            <h1 class="bar-title">{{ title }}</h1>
             <img class="logo-image" :src="logo" alt="Logo">
 
         </div>
         <div class="links-container flex x-centered">
             <div class="flex">
-                <router-link class="link-button flex x-centered y-centered" v-for="(link, i) in links" :key="i"
-                    :to="{ name: link.route }" @click="toggleMore">
-                    <p>{{ link.text }}</p>
-                </router-link>
+                <NavbarButton v-for="(item, i) in buttons" :key="i" :text="item.text" :icon="item.icon" :route="item.route" :sub-buttons="item.subButtons" />
             </div>
             <div class="extra-links-container flex">
                 <router-link class="cart-container flex" :to="{ name: 'Cart' }">
@@ -51,6 +56,9 @@ defineProps({
 <script>
 export default {
     name: 'NavBar',
+    components: {
+        NavbarButton
+    },
     data() {
         return {
             activeMore: false,
@@ -69,16 +77,24 @@ export default {
     margin: auto;
 }
 
+.logo-image {
+    margin: auto;
+}
+
 .links-container {
     position: relative;
     background: var(--intense-brown);
     border-radius: 12px;
-    border: 2px solid var(--pale-tone);
+    padding: 8px;
+    /* border: 2px solid var(--pale-tone); */
 }
 
 .link-button {
     height: 60px;
+    width: 80px;
     padding: 0 15px 0 15px;
+    transition: all 0.2s;
+    margin: 2px 0 2px 0;
 }
 
 .link-button p {
@@ -86,10 +102,16 @@ export default {
     margin-bottom: 0;
 }
 
+.link-button.router-link-active {
+    background: var(--light-brown);
+    color: var(--black-soft);
+    border-radius: 4px;
+}
+
 .extra-links-container {
     position: absolute;
     right: 10px;
-    top: 12px;
+    top: calc(50% - 19px);
 }
 
 .cart-container {

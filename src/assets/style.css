@@ -18,14 +18,21 @@
 input,
 textarea,
 select,
+option,
 button {
   font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
   font-size: 14px;
   resize: none;
+  color: var(--black-soft);
 }
 
-input[type=radio], input[type=checkbox] {
+input[type=radio],
+input[type=checkbox] {
   margin: 0 4px 0 4px;
+}
+
+input[type=number]::-webkit-inner-spin-button {
+  opacity: 1;
 }
 
 body {
@@ -65,32 +72,45 @@ label {
 .flex {
   display: flex;
 }
+
 .flex.column {
   flex-direction: column;
 }
+
 .wide {
   width: 100%;
 }
+
 .flex.tall {
   height: 100%;
 }
+
 .flex.y-centered {
   align-items: center;
 }
+
 .flex.x-centered {
   justify-content: center;
 }
+
 .flex.space-between {
   justify-content: space-between;
 }
+
 .flex.space-evenly {
   justify-content: space-evenly;
 }
+
 .flex.right {
   justify-content: right;
 }
+
 .flex.left {
   justify-content: left;
+}
+
+.right-text {
+  text-align: right;
 }
 
 .centered-text {
@@ -111,6 +131,10 @@ label {
 
 .bottom-margin {
   margin-bottom: 15px;
+}
+
+.large-bottom-margin {
+  margin-bottom: 30px;
 }
 
 .vue-notification .notification-title {
@@ -137,6 +161,8 @@ label {
 }
 
 .action-button {
+  min-width: 60px;
+  min-height: 25px;
   font-size: 13px;
   font-weight: bold;
   border-width: 2px;
@@ -145,12 +171,13 @@ label {
   border-color: var(--black);
   background-color: var(--intense-brown);
   color: var(--soft-beige);
-  padding: 6px;
+  padding-block: 0;
+  padding-inline: 0;
   cursor: pointer;
 }
 
 .action-button.large {
-  width: 47%;
+  width: 45%;
   max-width: 450px;
   height: 55px;
   font-size: 16px;
@@ -176,6 +203,10 @@ img.loading-image {
   width: 32px;
 }
 
+.color-transition:not(:disabled) {
+  transition: linear background-color 0.2s, linear color 0.2s;
+}
+
 /* Multiselect */
 
 div.multiselect {
@@ -183,7 +214,8 @@ div.multiselect {
   border-radius: 5px;
 }
 
-input.multiselect__input, input.multiselect__single {
+input.multiselect__input,
+input.multiselect__single {
   color: var(--black);
 }
 
@@ -195,11 +227,13 @@ i.multiselect__tag-icon::after {
   color: var(--pale-tone);
 }
 
-span.multiselect__option--highlight, span.multiselect__option--highlight::after {
+span.multiselect__option--highlight,
+span.multiselect__option--highlight::after {
   background: var(--intense-brown);
 }
 
-span.multiselect__option--highlight.multiselect__option--selected, span.multiselect__option--highlight.multiselect__option--selected::after {
+span.multiselect__option--highlight.multiselect__option--selected,
+span.multiselect__option--highlight.multiselect__option--selected::after {
   background: var(--failure-tone);
 }
 
@@ -207,6 +241,14 @@ span.multiselect__option--highlight.multiselect__option--selected, span.multisel
   :root {
     color: var(--white);
     background-color: var(--black-soft);
+  }
+
+  input,
+  textarea,
+  select,
+  option,
+  button {
+    color: var(--white-soft);
   }
 
   .page-section.bordered {

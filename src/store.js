@@ -47,7 +47,7 @@ const store = createStore({
 
             const querySnapshot = await getDocs(q);
             querySnapshot.forEach((doc) => {
-                itemsList.push({ id: doc.id, ...doc.data() });
+                itemsList.push({ id: doc.id, pageDisplay: false, searchDisplay: true, categoryDisplay: true, priceDisplay: true, availabilityDisplay: true, ...doc.data() });
             });
 
             context.commit('SET_ITEMS', itemsList);

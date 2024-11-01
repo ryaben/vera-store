@@ -20,20 +20,18 @@ defineProps({
 
 <template>
     <section class="page-section bordered">
-        <TabSelector :tab-list="adminTabs" @tab-selected="selectTab" />
+        <TabSelector class="admin-tabs" :tab-list="adminTabs" @tab-selected="selectTab" />
 
         <div class="tab-container flex wide" v-show="selectedTab === 'orders'">
-            <Panel class="admin-panel" :card-source="ordersList" :panel-type="'order'"
-                @clicked-card="populateOrderForm" />
+            <Panel class="admin-panel" :card-source="ordersList" @clicked-card="populateOrderForm" />
             <PanelForm class="panel-form" :form-type="'order'" :form-info="orderForm" :items-list="itemsList" />
         </div>
         <div class="tab-container flex wide" v-show="selectedTab === 'items'">
-            <Panel class="admin-panel" :card-source="itemsList" :panel-type="'item'" @clicked-card="populateItemForm" />
+            <Panel class="admin-panel" :card-source="itemsList" @clicked-card="populateItemForm" />
             <PanelForm class="panel-form" :form-type="'item'" :form-info="itemForm" :items-list="itemsList" />
         </div>
         <div class="tab-container flex wide" v-show="selectedTab === 'partners'">
-            <Panel class="admin-panel" :card-source="partnersList" :panel-type="'partner'"
-                @clicked-card="populatePartnerForm" />
+            <Panel class="admin-panel" :card-source="partnersList" @clicked-card="populatePartnerForm" />
             <PanelForm class="panel-form" :form-type="'partner'" :form-info="partnerForm" :items-list="itemsList"
                 :marker-position="[partnerForm.partnerLocation._long, partnerForm.partnerLocation._lat]" @dragged-marker="updatePartnerLocation" />
         </div>
@@ -52,7 +50,8 @@ export default {
             adminTabs: [
                 { identifier: 'items', tabTitle: 'Store items' },
                 { identifier: 'orders', tabTitle: 'Customer orders' },
-                { identifier: 'partners', tabTitle: 'Partner hosts' }
+                { identifier: 'partners', tabTitle: 'Partner hosts' },
+                { identifier: 'coupons', tabTitle: 'Store coupons' }
             ],
             orderForm: {
                 customer: {
@@ -120,6 +119,11 @@ export default {
 </script>
 
 <style scoped>
+.admin-tabs:deep(.section-button label) {
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+}
+
 .admin-panel {
     width: 65%;
 }

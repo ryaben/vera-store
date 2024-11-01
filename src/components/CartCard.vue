@@ -23,7 +23,7 @@ defineProps({
 </script>
 
 <template>
-    <div class="item-card-wrapper flex x-centered wide">
+    <div class="item-card-wrapper flex x-centered">
         <div class="item-card flex wide">
             <img class="item-photo" :src="itemInfo.photo" alt="Photo">
             <div class="item-info-container flex column">
@@ -79,7 +79,12 @@ export default {
 
 <style scoped>
 .item-card-wrapper {
-    border-bottom: 2px solid var(--pale-tone);
+    background: var(--dimmed-brown);
+    border-radius: 8px;
+    margin-bottom: 4px;
+    width: 92%;
+    color: var(--black-soft);
+    /* border-bottom: 2px solid var(--pale-tone); */
 }
 
 .item-card {
@@ -104,6 +109,7 @@ export default {
 }
 
 .item-title {
+    font-size: 17px;
     margin: 0 0 3px 0;
 }
 
@@ -111,7 +117,7 @@ export default {
     width: 24px;
     height: 24px;
     cursor: pointer;
-    background-image: url("/img/delete-white.png");
+    background-image: url("/img/delete-black.png");
     background-size: cover;
     margin-right: 4px;
 }
@@ -123,24 +129,16 @@ export default {
 .item-price {
     font-size: 18px;
     font-weight: bold;
-    color: var(--light-brown);
+    color: var(--soft-brown);
 }
 
 .item-price.total {
-    color: var(--soft-brown);
+    color: var(--intense-brown);
 }
 
 @media (prefers-color-scheme: light) {
     .item-card-wrapper {
         border-color: var(--indigo);
-    }
-
-    .item-price.total {
-        color: var(--intense-brown);
-    }
-
-    .remove-icon {
-        background-image: url("/img/delete-black.png");
     }
 }
 </style>

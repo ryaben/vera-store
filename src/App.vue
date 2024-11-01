@@ -10,17 +10,22 @@ const windowHeight = height;
 
 <template>
   <MobileBar v-if="windowWidth <= 750" :links="mobileBarLinks" :item-count="cartList.length" />
-  <NavBar v-if="windowWidth > 750" :links="mobileBarLinks" :item-count="cartList.length" />
+  <NavBar v-if="windowWidth > 750" :links="mobileBarLinks" :item-count="cartList.length" :buttons="navBarButtons" />
 
   <main>
     <router-view v-slot="{ Component }">
       <Transition name="fade" mode="out-in">
         <KeepAlive :include="['Store', 'Cart', 'Admin Panel']">
-          <component :is="Component" :items-list="itemsList" :orders-list="ordersList" :cart-list="cartList" :partners-list="partnersList" />
+          <component :is="Component" :items-list="itemsList" :orders-list="ordersList" :cart-list="cartList"
+            :partners-list="partnersList" />
         </KeepAlive>
       </Transition>
     </router-view>
   </main>
+
+  <footer>
+
+  </footer>
 
   <notifications position="top center" width="350px" :speed="700" :pause-on-hover="true" />
 </template>
@@ -38,6 +43,11 @@ export default {
         { text: "Cart", route: "Cart" },
         { text: "FAQs", route: "Home" },
         { text: "About us", route: "AboutUs" }
+      ],
+      navBarButtons: [
+        { text: 'Home', icon: 'home.png', route: 'Home' },
+        { text: 'Store', icon: 'store.png', route: 'Store', subButtons: [{ text: 'Products', route: 'Store' }, { text: 'Cart', route: 'Cart' }] },
+        { text: 'Info', icon: 'info.png', route: 'Home', subButtons: [{ text: 'FAQs', route: 'Home' }, { text: 'About us', route: 'AboutUs' }] }
       ]
     }
   },

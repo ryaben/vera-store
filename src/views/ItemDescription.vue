@@ -1,5 +1,8 @@
 <script setup>
 import store from '../store';
+import { useWindowSize } from 'vue-window-size';
+const { width, height } = useWindowSize();
+const windowWidth = width;
 
 defineProps({
     itemID: {
@@ -15,10 +18,16 @@ defineProps({
 
 <template>
     <section class="page-section">
-        <h2 class="item-title">{{ itemData.title }}</h2>
-        <img class="item-photo" :src="itemData.photo" alt="Photo">
-        <p class="item-description">{{ itemData.longDescription }}</p>
-        <button class="action-button large red" @click="goBack">Go back</button>
+        <h2 class="item-title" :class="{ 'large-bottom-margin': windowWidth >= 1050 }">{{ itemData.title }}</h2>
+        <div class="flex x-centered" :class="{ 'column': windowWidth < 1050 }">
+            <div class="photo-flex flex column y-centered" :class="{ 'flex-sized': windowWidth >= 1050 }">
+                <img class="item-photo" :src="itemData.photo" alt="Photo">
+            </div>
+            <div class="description-flex flex column x-centered y-centered" :class="{ 'flex-sized': windowWidth >= 1050 }">
+                <p class="item-description">{{ itemData.longDescription }}</p>
+            </div>
+        </div>
+        <button class="action-button large red" :class="{ 'top-margin': windowWidth >= 1050 }" @click="goBack">Go back</button>
     </section>
 </template>
 
@@ -32,7 +41,7 @@ export default {
     computed: {
         itemData() {
             const that = this;
-            return this.itemsList.find(function(element) {
+            return this.itemsList.find(function (element) {
                 return element.id === that.itemID;
             });
         }
@@ -56,6 +65,18 @@ export default {
     max-width: 400px;
     max-height: 50vh;
     margin-bottom: 20px;
+}
+
+.photo-flex.flex-sized {
+    width: 40%;
+}
+
+.photo-flex.flex-sized .item-photo {
+    width: 100%;
+}
+
+.description-flex.flex-sized {
+    width: 60%;
 }
 
 .item-description {

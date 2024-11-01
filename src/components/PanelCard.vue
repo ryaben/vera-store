@@ -5,10 +5,10 @@ defineProps({
         required: true,
         default: {}
     },
-    cardType: {
+    displayParameter: {
         type: String,
         required: false,
-        default: 'order'
+        default: 'id'
     },
     cardIndex: {
         type: Number,
@@ -21,12 +21,7 @@ defineProps({
 <template>
     <div class="card-container flex column" @click="exportData(); exportIndex()">
         <p class="id-title">
-            <span v-if="cardType === 'order'">ID:&nbsp;</span>
-            <span v-if="cardType === 'item'">Title:&nbsp;</span>
-            <span v-if="cardType === 'partner'">Address:&nbsp;</span>
-            <span v-if="cardType === 'order'" class="bold colored">{{ cardInfo.id }}</span>
-            <span v-if="cardType === 'item'" class="bold colored">{{ cardInfo.title }}</span>
-            <span v-if="cardType === 'partner'" class="bold colored">{{ cardInfo.partnerAddress }}</span>
+            <span class="bold colored">{{ cardInfo[displayParameter] }}</span>
         </p>
     </div>
 </template>
@@ -65,7 +60,7 @@ export default {
 }
 
 .colored {
-    color: var(--soft-brown);
+    color: var(--light-brown);
 }
 
 @media (prefers-color-scheme: light) {
