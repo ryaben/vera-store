@@ -4,6 +4,7 @@
 
 <template>
     <section class="page-section">
+        
         <p>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vel egestas dolor, nec dignissim metus. Donec
             augue elit, rhoncus ac sodales id, porttitor vitae est. Donec laoreet rutrum libero sed pharetra. Duis a
@@ -23,8 +24,12 @@
 <script>
 export default {
     name: 'Home',
+    components: {
+        
+    },
     data() {
         return {
+            
         }
     }
 }

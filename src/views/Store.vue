@@ -34,16 +34,16 @@ defineProps({
                     <p class="tools-title bold">Categories</p>
                     <Multiselect v-model="filteredCategories" :options="categoriesInItems" :multiple="true"
                         select-label="Tap to select" deselect-label="Tap to remove" open-direction="below"
-                        @select="filterByCategory" @remove="filterByCategory" />
+                        @select="filterByCategory" @remove="filterByCategory" class="category-selector" />
                 </div>
-                <div class="flex column y-centered tab-wrapper">
+                <div class="flex column tab-wrapper">
                     <p class="tools-title bold">Price</p>
                     <label class="tab-label" for="itemMinPrice">
                         <input class="item-price" type="number" name="itemPrice" v-model="filteredPrice.min"
-                            placeholder="Minimum" min="1" @input="filterByPrice">
+                            placeholder="Min." min="1" @input="fixPrices(); filterByPrice" @change="fixPrices(); filterByPrice()">
                         &nbsp;—&nbsp;
                         <input class="item-price" type="number" name="itemPrice" v-model="filteredPrice.max"
-                            placeholder="Maximum" min="1" @input="filterByPrice">
+                            placeholder="Max." min="1" @input="fixPrices(); filterByPrice" @change="fixPrices(); filterByPrice()">
                     </label>
                 </div>
                 <div class="store-stats">
@@ -58,23 +58,14 @@ defineProps({
             </div>
             <Transition name="fade">
                 <div v-if="itemsList.length" id="resultsContainer" class="flex column wide">
-                    <div class="display-tools flex wide space-between">
+                    <div class="display-tools flex y-centered wide space-between bottom-margin">
                         <label for="itemsPerPage">
                             <span class="bold">Items/page: </span><input type="number" id="itemsPerPage" min="1"
                                 max="500" v-model="itemsPerPage" @input="pageElements">
                         </label>
-                        <label for="productsSorting">
-                            <span class="bold">Sort by: </span><select name="productsSorting" id="productsSorting"
-                                v-model="productsSorting" @change="sortItems">
-                                <option value="none">None</option>
-                                <option value="ascendingOrder">Alphabet (A to Z)</option>
-                                <option value="descendingOrder">Alphabet (Z to A)</option>
-                                <option value="mostPopular">Most popular</option>
-                                <option value="lowestPrice">Price (lowest)</option>
-                                <option value="highestPrice">Price (highest)</option>
-                                <option value="random">Random</option>
-                            </select>
-                        </label>
+                        <Multiselect v-model="selectedSort" :options="sortOptions" open-direction="below" label="label"
+                            @select="sortItems" :searchable="false" :select-label="''" :deselect-label="''"
+                            :allow-empty="false" class="sort-selector" />
                     </div>
                     <Transition name="fade">
                         <div :key="componentKey">
@@ -109,7 +100,17 @@ export default {
             selectedTab: 'category',
             productsSorting: "none",
             itemsPerPage: 20,
-            currentPage: 1
+            currentPage: 1,
+            sortOptions: [
+                { label: "No sorting", value: "none" },
+                { label: "Alphabet (A to Z)", value: "ascendingOrder" },
+                { label: "Alphabet (Z to A)", value: "descendingOrder" },
+                { label: "Most popular", value: "mostPopular" },
+                { label: "Price (lowest)", value: "lowestPrice" },
+                { label: "Price (highest)", value: "highestPrice" },
+                { label: "Random", value: "random" }
+            ],
+            selectedSort: { label: "No sorting", value: "none" }
         }
     },
     watch: {
@@ -152,6 +153,12 @@ export default {
             this.currentPage = result;
             this.pageElements();
         },
+        fixPrices() {
+            if (this.filteredPrice.min < 1) this.filteredPrice.min = 1;
+            if (this.filteredPrice.max > 1000) this.filteredPrice.max = 1000;
+            if (this.filteredPrice.min > this.filteredPrice.max) this.filteredPrice.min = this.filteredPrice.max;
+            if (this.filteredPrice.max < this.filteredPrice.min) this.filteredPrice.max = this.filteredPrice.min;
+        },
         pageElements() {
             const that = this;
 
@@ -175,7 +182,7 @@ export default {
             this.componentKey++;
         },
         sortItems() {
-            switch (this.productsSorting) {
+            switch (this.selectedSort.value) {
                 case 'ascendingOrder':
                     this.itemsList.sort((a, b) => (this.normalizeString(a.title) > this.normalizeString(b.title)) ? 1 : -1);
                     break;
@@ -237,18 +244,11 @@ export default {
             this.pageElements();
         },
         filterByPrice() {
-            const that = this;
+            const minPrice = this.filteredPrice.min === '' ? 1 : this.filteredPrice.min;
+            const maxPrice = this.filteredPrice.max === '' ? Infinity : this.filteredPrice.max;
 
             this.itemsList.forEach(function (element) {
-                if (!that.filteredPrice.min && !that.filteredPrice.max) {
-                    element.priceDisplay = true;
-                } else if (!that.filteredPrice.min && that.filteredPrice.max) {
-                    element.price <= that.filteredPrice.max ? element.priceDisplay = true : element.priceDisplay = false;
-                } else if (that.filteredPrice.min && !that.filteredPrice.max) {
-                    element.price >= that.filteredPrice.min ? element.priceDisplay = true : element.priceDisplay = false;
-                } else if (that.filteredPrice.min && that.filteredPrice.max) {
-                    that.filteredPrice.min <= element.price && element.price <= that.filteredPrice.max ? element.priceDisplay = true : element.priceDisplay = false;
-                }
+                element.price >= minPrice && element.price <= maxPrice ? element.priceDisplay = true : element.priceDisplay = false;
             });
 
             this.pageElements();
@@ -275,7 +275,8 @@ export default {
 <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
 <style scoped>
 .display-tools {
-    margin-bottom: 5px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--white-soft);
 }
 
 .store-container {
@@ -308,7 +309,7 @@ export default {
 .item-price {
     font-size: 16px;
     width: 37%;
-    max-width: 250px;
+    max-width: 100px;
     height: 30px;
     background-color: var(--white-soft);
     color: var(--black-mute);
@@ -367,12 +368,23 @@ export default {
     width: 45px;
 }
 
-div.multiselect {
-    max-width: 500px;
+.multiselect.category-selector {
+    height: 32px;
+}
+
+.multiselect.sort-selector {
+    font-weight: normal;
+    width: 35%;
+    min-width: 180px;
+    max-width: 300px;
 }
 
 @media (prefers-color-scheme: light) {
     .products-amount {
+        border-color: var(--black-soft);
+    }
+
+    .display-tools {
         border-color: var(--black-soft);
     }
 }

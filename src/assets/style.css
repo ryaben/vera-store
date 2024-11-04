@@ -17,13 +17,16 @@
 
 input,
 textarea,
-select,
-option,
 button {
   font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
   font-size: 14px;
   resize: none;
   color: var(--black-soft);
+}
+
+select, option {
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  font-size: 14px;
 }
 
 input[type=radio],
@@ -212,6 +215,7 @@ img.loading-image {
 div.multiselect {
   border: 1px solid var(--soft-brown);
   border-radius: 5px;
+  max-width: 500px;
 }
 
 input.multiselect__input,
@@ -225,6 +229,7 @@ span.multiselect__tag {
 
 i.multiselect__tag-icon::after {
   color: var(--pale-tone);
+  font-size: 20px;
 }
 
 span.multiselect__option--highlight,
@@ -245,10 +250,12 @@ span.multiselect__option--highlight.multiselect__option--selected::after {
 
   input,
   textarea,
-  select,
-  option,
   button {
     color: var(--white-soft);
+  }
+
+  select, option {
+    color: var(--black-soft);
   }
 
   .page-section.bordered {
