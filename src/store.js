@@ -7,7 +7,9 @@ const store = createStore({
         items: [],
         orders: [],
         cart: [],
-        partners: []
+        partners: [],
+        coupons: [],
+        checkout: 0
     },
     getters: {
         items(state) {
@@ -21,6 +23,12 @@ const store = createStore({
         },
         partners(state) {
             return state.partners;
+        },
+        coupons(state) {
+            return state.coupons;
+        },
+        checkout(state) {
+            return state.checkout;
         }
     },
     mutations: {
@@ -33,11 +41,17 @@ const store = createStore({
         SET_PARTNERS(state, value) {
             state.partners = value;
         },
+        SET_COUPONS(state, value) {
+            state.coupons = value;
+        },
+        SET_CHECKOUT_AMOUNT(state, value) {
+            state.checkout = value;
+        },
         ADD_CART(state, value) {
             state.cart = state.cart.concat(value);
         },
-        CLEAR_CART(state, value) {
-            state.cart = value;
+        CLEAR_CART(state) {
+            state.cart.length = 0;
         }
     },
     actions: {
@@ -74,11 +88,25 @@ const store = createStore({
 
             context.commit('SET_PARTNERS', partnersList);
         },
+        async getCoupons(context) {
+            const q = query(collection(db, "coupons"));
+            let couponsList = [];
+
+            const querySnapshot = await getDocs(q);
+            querySnapshot.forEach((doc) => {
+                couponsList.push({ id: doc.id, redeemed: false, ...doc.data() });
+            });
+
+            context.commit('SET_COUPONS', couponsList);
+        },
+        setCheckoutAmount(context, payload) {
+            context.commit('SET_CHECKOUT_AMOUNT', payload.amount);
+        },
         addToCart(context, payload) {
             context.commit('ADD_CART', payload.addedToCart);
         },
         clearCart(context) {
-            context.commit('CLEAR_CART', []);
+            context.commit('CLEAR_CART');
         }
     }
 });

@@ -29,6 +29,7 @@ defineProps({
 <script>
 export default {
     name: 'Panel Card',
+    emits: ['clickedCard', 'updatedIndex'],
     data() {
         return {
         }
@@ -52,6 +53,7 @@ export default {
     border: 1px solid var(--white-soft);
     border-radius: 8px;
     cursor: pointer;
+    overflow: hidden;
 }
 
 .id-title {

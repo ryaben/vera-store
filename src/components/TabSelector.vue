@@ -65,6 +65,7 @@ export default {
     text-align: center;
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
+    padding: 0 2px;
 }
 
 .section-button label.selected {
@@ -75,6 +76,7 @@ export default {
 @media only screen and (max-width: 500px) {
     .section-button label {
         font-size: 14px;
+        letter-spacing: -0.4px;
     }
 }
 

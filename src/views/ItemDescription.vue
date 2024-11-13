@@ -18,16 +18,16 @@ defineProps({
 
 <template>
     <section class="page-section">
-        <h2 class="item-title" :class="{ 'large-bottom-margin': windowWidth >= 1050 }">{{ itemData.title }}</h2>
+        <h2 class="item-title centered-text" :class="{ 'large-bottom-margin': windowWidth >= 1050 }">{{ itemData.itemTitle }}</h2>
         <div class="flex x-centered" :class="{ 'column': windowWidth < 1050 }">
             <div class="photo-flex flex column y-centered" :class="{ 'flex-sized': windowWidth >= 1050 }">
-                <img class="item-photo" :src="itemData.photo" alt="Photo">
+                <img class="item-photo" :src="itemData.itemPhoto" alt="Photo">
             </div>
             <div class="description-flex flex column x-centered y-centered" :class="{ 'flex-sized': windowWidth >= 1050 }">
-                <p class="item-description">{{ itemData.longDescription }}</p>
+                <p class="item-description">{{ itemData.itemLongDescription }}</p>
             </div>
         </div>
-        <button class="action-button large red" :class="{ 'top-margin': windowWidth >= 1050 }" @click="goBack">Go back</button>
+        <button class="action-button large red" :class="{ 'top-margin': windowWidth >= 1050 }" @click="goBack">{{ $t("itemDescription.back") }}</button>
     </section>
 </template>
 
@@ -62,9 +62,11 @@ export default {
 
 .item-photo {
     width: 70%;
-    max-width: 400px;
-    max-height: 50vh;
+    max-width: 350px;
+    max-height: 300px;
     margin-bottom: 20px;
+    border-radius: 10px;
+    border: 2px solid var(--soft-brown);
 }
 
 .photo-flex.flex-sized {

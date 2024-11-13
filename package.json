@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@intlify/unplugin-vue-i18n": "^4.0.0",
     "@kyvg/vue3-notification": "^3.0.1",
     "@mapbox/mapbox-gl-geocoder": "^5.0.1",
     "@studiometa/vue-mapbox-gl": "^2.1.1",
@@ -18,14 +19,19 @@
     "mapbox-gl": "^2.15.0",
     "vue": "^3.4.37",
     "vue-animate-height": "^1.1.2",
+    "vue-awesome-paginate": "^1.2.0",
+    "vue-flux": "^7.0.0-beta.6",
+    "vue-i18n": "^9.14.1",
     "vue-multiselect": "^3.1.0",
     "vue-recaptcha": "^2.0.3",
     "vue-router": "^4.0.13",
+    "vue-toggle-component": "^1.0.16",
     "vue-window-size": "^2.0.0",
     "vuex": "^4.0.2"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.1.2",
-    "vite": "^5.4.1"
+    "vite": "^5.4.1",
+    "vue-cli-plugin-i18n": "^2.3.2"
   }
 }

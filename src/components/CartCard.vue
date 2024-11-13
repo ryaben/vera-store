@@ -25,22 +25,31 @@ defineProps({
 <template>
     <div class="item-card-wrapper flex x-centered">
         <div class="item-card flex wide">
-            <img class="item-photo" :src="itemInfo.photo" alt="Photo">
+            <img class="item-photo" :src="itemInfo.itemPhoto" alt="Photo">
             <div class="item-info-container flex column">
                 <div class="flex column">
-                    <h2 class="item-title">{{ itemInfo.title }}</h2>
+                    <h2 class="item-title">{{ itemInfo.itemTitle }}</h2>
                     <div class="flex y-centered">
                         <div class="remove-icon" @click="removeItems"></div>
-                        <label @click="removeItems">Remove</label>
+                        <label @click="removeItems">{{ $t('cartCard.remove') }}</label>
                     </div>
                 </div>
                 <div class="flex y-centered">
                     <label>
                         <span>{{ cartItemCount.length }} x </span>
-                        <span class="item-price">${{ itemInfo.price.toFixed(2) }}</span>
+                        <span class="item-price">
+                            <span v-if="!itemInfo.itemOnSale">${{ itemInfo.itemPrice.toFixed(2) }}</span>
+                            <span v-if="itemInfo.itemOnSale">${{ itemInfo.itemPriceSale.toFixed(2) }}</span>
+                        </span>
                         <span> = </span>
-                        <span class="item-price total">${{ (cartItemCount.length * itemInfo.price.toFixed(2)).toFixed(2)
-                            }}</span>
+                        <span class="item-price total">
+                            <span v-if="!itemInfo.itemOnSale">
+                                ${{(cartItemCount.length * itemInfo.itemPrice.toFixed(2)).toFixed(2)}}
+                            </span>
+                            <span v-if="itemInfo.itemOnSale">
+                                ${{(cartItemCount.length * itemInfo.itemPriceSale.toFixed(2)).toFixed(2)}}
+                            </span>
+                        </span>
                     </label>
                 </div>
             </div>
@@ -97,7 +106,7 @@ export default {
 
 .item-photo {
     width: 35%;
-    height: 100%;
+    height: 85%;
     max-width: 200px;
     max-height: 210px;
     border-radius: 4px;

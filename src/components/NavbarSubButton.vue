@@ -31,6 +31,7 @@ export default {
 
 <style scoped>
 .subbutton-router-link {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;

@@ -1,18 +1,12 @@
 <script setup>
 import NavbarButton from './NavbarButton.vue';
+import LanguageSelector from './LanguageSelector.vue';
 
 defineProps({
     logo: {
         type: String,
         required: false,
         default: '/img/logo.png'
-    },
-    links: {
-        type: Array,
-        required: true,
-        default: [{
-            text: "Home", route: "Home"
-        }]
     },
     itemCount: {
         type: Number,
@@ -33,11 +27,12 @@ defineProps({
     <nav class="navbar flex column">
         <div class="bar-elements flex">
             <img class="logo-image" :src="logo" alt="Logo">
-
         </div>
         <div class="links-container flex x-centered">
+            <LanguageSelector />
             <div class="flex">
-                <NavbarButton v-for="(item, i) in buttons" :key="i" :text="item.text" :icon="item.icon" :route="item.route" :sub-buttons="item.subButtons" />
+                <NavbarButton v-for="(item, i) in buttons" :key="i" :text="item.text" :icon="item.icon"
+                    :route="item.route" :sub-buttons="item.subButtons" />
             </div>
             <div class="extra-links-container flex">
                 <router-link class="cart-container flex" :to="{ name: 'Cart' }">
@@ -57,16 +52,13 @@ defineProps({
 export default {
     name: 'NavBar',
     components: {
-        NavbarButton
+        NavbarButton, LanguageSelector
     },
     data() {
         return {
             activeMore: false,
             height: 0
         }
-    },
-    methods: {
-
     }
 }
 </script>
@@ -79,6 +71,12 @@ export default {
 
 .logo-image {
     margin: auto;
+}
+
+div.multiselect.language-selector {
+    position: absolute;
+    left: 10px;
+    top: calc(50% - 27px);
 }
 
 .links-container {
@@ -142,8 +140,8 @@ export default {
     width: 18px;
     height: 18px;
     border-radius: 50%;
-    background-color: var(--intense-brown);
-    color: var(--pale-tone);
+    background-color: var(--indigo-dark);
+    color: var(--white-soft);
 }
 
 .cart-count-container label {

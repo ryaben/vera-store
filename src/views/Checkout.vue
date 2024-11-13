@@ -3,7 +3,7 @@ import store from '../store';
 import axios from "axios";
 import AnimateHeight from 'vue-animate-height';
 import { db } from '../firebase/init.js';
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, Timestamp } from "firebase/firestore";
 import Recaptcha from '../components/ReCaptcha.vue';
 import MapboxMap from '../components/MapboxMap.vue';
 import { notify } from "@kyvg/vue3-notification";
@@ -26,33 +26,38 @@ defineProps({
         type: Array,
         required: false,
         default: store.getters.partners
+    },
+    checkoutAmount: {
+        type: Number,
+        required: false,
+        default: store.getters.checkout
     }
 });
 </script>
 
 <template>
     <section class="page-section">
-        <h1 class="form-title">Order request</h1>
+        <h1 class="form-title">{{ $t("checkout.title") }}</h1>
         <div class="flex column y-centered" v-if="processingOrder">
             <img class="loading-image" src="/img/loading.gif" alt="Loading">
-            <p>Processing...</p>
+            <p>{{ $t("checkout.processing") }}</p>
         </div>
-        <form class="form-container flex wide" :class="{'column': windowWidth < 1050}" @submit.prevent="issueOrder">
-            <div class="form-subcontainer flex column" :class="{'wide right-border': windowWidth >= 1050}">
-                <h2 class="centered-text">Customer info</h2>
+        <form class="form-container flex wide" :class="{ 'column': windowWidth < 1050 }" @submit.prevent="issueOrder">
+            <div class="form-subcontainer flex column" :class="{ 'wide right-border': windowWidth >= 1050 }">
+                <h2 class="centered-text">{{ $t("checkout.formSectionTitle1") }}</h2>
                 <div class="form-field flex column y-centered">
-                    <label for="checkoutFormName">Full name</label>
+                    <label for="checkoutFormName">{{ $t("checkout.formField1") }}</label>
                     <input type="text" id="checkoutFormName" required placeholder="John Doe" v-model="customerName">
                 </div>
                 <div class="form-field flex column y-centered">
-                    <label for="checkoutFormEmail">Email address</label>
+                    <label for="checkoutFormEmail">{{ $t("checkout.formField2") }}</label>
                     <input type="email" id="checkoutFormEmail" required placeholder="john.doe@email.com"
                         v-model="customerEmail">
                 </div>
                 <div class="form-field flex column y-centered">
-                    <label>Host location</label>
-                    <p>Selected:
-                        <span v-if="!selectedHost">None.</span>
+                    <label>{{ $t("checkout.formField3") }}</label>
+                    <p>{{ $t("checkout.selected") }}
+                        <span v-if="!selectedHost">{{ $t("checkout.noneSelected") }}</span>
                         <span v-if="selectedHost" class="bold">
                             {{ selectedHostAddress }}
                         </span>
@@ -62,17 +67,17 @@ defineProps({
                 </div>
             </div>
 
-            <div class="form-subcontainer flex column" :class="{'wide': windowWidth >= 1050}">
-                <h2 class="centered-text">Payment procedure</h2>
+            <div class="form-subcontainer flex column" :class="{ 'wide': windowWidth >= 1050, 'top-border': windowWidth < 1050 }">
+                <h2 class="centered-text">{{ $t("checkout.formSectionTitle2") }}</h2>
                 <div class="purchase-overview flex space-between">
-                    <p>{{ cartList.length }} items</p>
+                    <p>{{ cartList.length }} {{ $t("checkout.items") }}</p>
                     <div class="flex" style="margin: auto;">
                         <select name="orderCurrency" id="currencySelector" v-model="orderCurrency">
                             <option value="usd">USD</option>
                             <option v-if="paymentMethod === 'cash'" value="ars">ARS</option>
                         </select>
-                        <p v-if="orderCurrency === 'usd'" class="total-price">{{ cartTotal.toFixed(2) }}</p>
-                        <p v-if="orderCurrency === 'ars'" class="total-price">{{ (cartTotal * blueDollarRate).toFixed(2)
+                        <p v-if="orderCurrency === 'usd'" class="total-price">{{ checkoutAmount.toFixed(2) }}</p>
+                        <p v-if="orderCurrency === 'ars'" class="total-price">{{ (checkoutAmount * blueDollarRate).toFixed(2)
                             }}
                         </p>
                     </div>
@@ -81,46 +86,34 @@ defineProps({
                     <div class="flex x-centered y-centered">
                         <input id="methodCash" type="radio" name="payment-method" value="cash"
                             @change="updateHeight(); updateCurrencyToUSD()" v-model="paymentMethod">
-                        <label for="methodCash">Cash (USD or Argentinean Peso)</label>
+                        <label for="methodCash">{{ $t("checkout.paymentMethod1") }}</label>
                     </div>
                     <div class="flex x-centered y-centered">
                         <input id="methodCard" type="radio" name="payment-method" value="card"
                             @change="updateHeight(); updateCurrencyToUSD()" v-model="paymentMethod">
-                        <label for="methodCard">Credit/debit card, bank transfer</label>
+                        <label for="methodCard">{{ $t("checkout.paymentMethod2") }}</label>
                     </div>
                 </div>
                 <AnimateHeight :duration="300" :height="noteHeight" :animate-opacity="true">
-                    <p id="cartNotice" class="negative-text" v-show="cartTotal < 20">
-                        Minimum amount of <b>$20</b> not reached. This is a threshold that Payoneer imposes for payment
-                        requests.
-                        You can instead either choose 'Cash' as payment method, or <router-link
-                            :to="{ name: 'Store' }">add
-                            more
-                            items to the order</router-link>.
+                    <p id="cartNotice" class="negative-text" v-show="checkoutAmount < 20">
+                        {{ $t("checkout.cartNotice") }}<router-link :to="{ name: 'Store' }">{{
+                            $t("checkout.cartNoticeLink") }}</router-link>
                     </p>
                     <p class="form-note">
-                        Payment will be processed by <img src="/img/payoneer.png" alt="Logo"><a class="payoneer-text"
-                            href="https://www.payoneer.com/" target="_blank">Payoneer</a>, a global renowned solution
-                        for
-                        international purchases. Once you issue the order, we will receive it and generate a payment
-                        link
-                        afterwards.
-                        This payment link will be sent to you at the email address you added above. You'll be able to
-                        pay
-                        with any type
-                        of card, regardless of its issuer and country of origin. Charge will be carried out in United
-                        States
-                        Dollar (USD).
+                        {{ $t("checkout.payoneerNote1") }}<img src="/img/payoneer.png" alt="Logo"><a
+                            class="payoneer-text" href="https://www.payoneer.com/" target="_blank">Payoneer</a>{{
+                                $t("checkout.payoneerNote2") }}
                     </p>
                 </AnimateHeight>
                 <Recaptcha class="order-recaptcha flex x-centered" @checkbox="checkRecaptcha" />
                 <div class="flex wide space-evenly" style="margin-bottom: 20px;">
                     <button class="action-button large red flex y-centered x-centered">
-                        <router-link class="flex wide tall x-centered y-centered" :to="{ name: 'Cart' }">Back to
-                            cart</router-link>
+                        <router-link class="flex wide tall x-centered y-centered" :to="{ name: 'Cart' }">
+                            {{ $t("checkout.back") }}
+                        </router-link>
                     </button>
-                    <input class="action-button large" type="submit" value="Issue order"
-                        :class="{ 'disabled': (paymentMethod === 'card' && cartTotal < 20) || !passedRecaptcha || cartTotal <= 0 }">
+                    <input class="action-button large" type="submit" :value="$t('checkout.issueOrder')"
+                        :class="{ 'disabled': (paymentMethod === 'card' && checkoutAmount < 20) || !passedRecaptcha || checkoutAmount <= 0 }">
                 </div>
             </div>
         </form>
@@ -147,15 +140,6 @@ export default {
         }
     },
     computed: {
-        cartTotal() {
-            let totalValue = 0;
-
-            this.cartList.forEach(function (element) {
-                totalValue += element.price;
-            });
-
-            return totalValue;
-        },
         selectedHostAddress() {
             const that = this;
             return this.partnersList.find(el => { return el.id === that.selectedHost }).partnerAddress;
@@ -169,6 +153,8 @@ export default {
             this.orderCurrency = 'usd';
         },
         async issueOrder() {
+            const that = this;
+
             if (!this.selectedHost) {
                 return this.missingHostNotification();
             }
@@ -182,12 +168,16 @@ export default {
                 },
                 paymentMethod: this.paymentMethod,
                 paymentLink: '',
+                orderCurrency: this.orderCurrency,
+                orderIssueDate: Timestamp.fromDate(new Date()),
+                orderLocation: this.selectedHost,
                 orderStatus: 0,
-                orderPrice: this.cartTotal,
+                orderPrice: this.checkoutAmount,
                 orderItems: this.cartList.map((item) => { return item.id })
             });
 
             await store.dispatch("clearCart");
+            await store.dispatch("setCheckoutAmount", { amount: 0 });
             this.processingOrder = false;
             this.orderCreationNotification(docRef.id);
             this.$router.push({ name: 'Order', params: { orderID: docRef.id } });
@@ -197,20 +187,23 @@ export default {
         },
         orderCreationNotification(orderID) {
             notify({
-                title: "Order successfully created",
-                text: `We got your order with ID ${orderID}! We've sent you an email containing the link to this order page.`,
+                title: this.$t("checkout.orderCreatedTitle"),
+                text: `${this.$t("checkout.orderCreatedText1")}${orderID}${this.$t("checkout.orderCreatedText2")}`,
                 type: "success"
             });
         },
         missingHostNotification() {
             notify({
-                title: "No host selected",
-                text: `Please, select the place where you are staying at so we can deliver the package at your location.`,
+                title: this.$t("checkout.noHostTitle"),
+                text: this.$t("checkout.noHostText"),
                 type: "error"
             });
         },
         selectHost(markerID) {
             this.selectedHost = markerID;
+        },
+        convertTZ(date, tzString) {
+            return new Date((typeof date === "string" ? new Date(date) : date).toLocaleString("es-AR", { timeZone: tzString }));
         }
     },
     mounted() {
@@ -230,6 +223,7 @@ export default {
 .form-title {
     font-size: 24px;
     margin-top: 0;
+    margin-bottom: 2.5%;
 }
 
 .form-container {
@@ -239,6 +233,10 @@ export default {
 
 .form-subcontainer {
     padding: 10px;
+}
+
+.form-subcontainer.top-border {
+    border-top: 2px solid var(--white-soft);
 }
 
 div.right-border {
@@ -304,7 +302,9 @@ div.right-border {
 }
 
 @media (prefers-color-scheme: light) {
-    .form-container, div.right-border {
+    .form-container,
+    div.right-border,
+    .form-subcontainer.top-border {
         border-color: var(--black-soft);
     }
 

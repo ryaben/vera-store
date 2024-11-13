@@ -13,7 +13,7 @@ defineProps({
 <template>
     <div class="panel-container flex">
         <div class="flex wide bottom-margin">
-            <label>Display by:&nbsp;</label>
+            <label>{{ $t('panel.displayBy') }}&nbsp;</label>
             <select v-model="displayParameter">
                 <option v-for="(parameter, i) in parameterOptions" :key="i" :value="parameter">{{ parameter }}</option>
             </select>
@@ -30,7 +30,7 @@ export default {
     components: {
         PanelCard
     },
-    emits: ["clicked-card"],
+    emits: ["clickedCard"],
     data() {
         return {
             selectedIndex: undefined,

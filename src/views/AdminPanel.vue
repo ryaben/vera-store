@@ -14,13 +14,23 @@ defineProps({
         type: Array,
         required: false,
         default: store.getters.partners
+    },
+    couponsList: {
+        type: Array,
+        required: false,
+        default: store.getters.coupons
     }
 });
 </script>
 
 <template>
     <section class="page-section bordered">
-        <TabSelector class="admin-tabs" :tab-list="adminTabs" @tab-selected="selectTab" />
+        <TabSelector class="admin-tabs" @tab-selected="selectTab" :tab-list="[
+            { identifier: 'items', tabTitle: $t('adminPanel.itemsTabTitle') },
+            { identifier: 'orders', tabTitle: $t('adminPanel.ordersTabTitle') },
+            { identifier: 'partners', tabTitle: $t('adminPanel.hostsTabTitle') },
+            { identifier: 'coupons', tabTitle: $t('adminPanel.couponsTabTitle') }
+        ]" />
 
         <div class="tab-container flex wide" v-show="selectedTab === 'orders'">
             <Panel class="admin-panel" :card-source="ordersList" @clicked-card="populateOrderForm" />
@@ -33,7 +43,12 @@ defineProps({
         <div class="tab-container flex wide" v-show="selectedTab === 'partners'">
             <Panel class="admin-panel" :card-source="partnersList" @clicked-card="populatePartnerForm" />
             <PanelForm class="panel-form" :form-type="'partner'" :form-info="partnerForm" :items-list="itemsList"
-                :marker-position="[partnerForm.partnerLocation._long, partnerForm.partnerLocation._lat]" @dragged-marker="updatePartnerLocation" />
+                :marker-position="[partnerForm.partnerLocation._long, partnerForm.partnerLocation._lat]"
+                @dragged-marker="updatePartnerLocation" />
+        </div>
+        <div class="tab-container flex wide" v-show="selectedTab === 'coupons'">
+            <Panel class="admin-panel" :card-source="couponsList" @clicked-card="populateCouponForm" />
+            <PanelForm class="panel-form" :form-type="'coupon'" :form-info="couponForm" :items-list="itemsList" />
         </div>
     </section>
 </template>
@@ -47,12 +62,6 @@ export default {
     data() {
         return {
             selectedTab: 'items',
-            adminTabs: [
-                { identifier: 'items', tabTitle: 'Store items' },
-                { identifier: 'orders', tabTitle: 'Customer orders' },
-                { identifier: 'partners', tabTitle: 'Partner hosts' },
-                { identifier: 'coupons', tabTitle: 'Store coupons' }
-            ],
             orderForm: {
                 customer: {
                     name: '',
@@ -66,12 +75,16 @@ export default {
                 paymentMethod: ''
             },
             itemForm: {
-                available: true,
-                longDescription: '',
-                photo: '',
-                price: '',
-                shortDescription: '',
-                title: ''
+                itemAvailability: true,
+                itemOnSale: false,
+                itemHidden: false,
+                itemCategories: [],
+                itemLongDescription: '',
+                itemPhoto: '',
+                itemPrice: '',
+                itemPriceSale: '',
+                itemShortDescription: '',
+                itemTitle: ''
             },
             partnerForm: {
                 partnerAddress: '',
@@ -84,6 +97,17 @@ export default {
                 partnerPhone: '',
                 partnerActivity: true,
                 partnerPrivacy: false
+            },
+            couponForm: {
+                couponCode: '',
+                couponType: 'percentage',
+                couponAmount: 1,
+                couponAppliesOn: 'cart',
+                couponApplyValue: '',
+                couponAppliesOnItems: [],
+                couponIncludeSaleItems: false,
+                couponActive: true,
+                couponMinimumSpend: 0
             }
         }
     },
@@ -101,6 +125,9 @@ export default {
         },
         populatePartnerForm(cardInfo) {
             this.partnerForm = cardInfo;
+        },
+        populateCouponForm(cardInfo) {
+            this.couponForm = cardInfo;
         },
         updatePartnerLocation(newPosition) {
             this.partnerForm.partnerLocation = {

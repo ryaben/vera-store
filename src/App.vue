@@ -3,27 +3,36 @@ import store from './store';
 import MobileBar from './components/MobileBar.vue';
 import NavBar from './components/NavBar.vue';
 import { useWindowSize } from 'vue-window-size';
-const { width, height } = useWindowSize();
+const { width } = useWindowSize();
 const windowWidth = width;
-const windowHeight = height;
 </script>
 
 <template>
-  <MobileBar v-if="windowWidth <= 750" :links="mobileBarLinks" :item-count="cartList.length" />
-  <NavBar v-if="windowWidth > 750" :links="mobileBarLinks" :item-count="cartList.length" :buttons="navBarButtons" />
+  <MobileBar v-if="windowWidth <= 750" :item-count="cartList.length" :links="[
+    { text: $t('app.navBarHomeButton'), route: 'Home' },
+    { text: $t('app.navBarStoreButton'), route: 'Store' },
+    { text: $t('app.navBarCartButton'), route: 'Cart' },
+    { text: $t('app.navBarFAQsButton'), route: 'FAQs' },
+    { text: $t('app.navBarAboutUsButton'), route: 'AboutUs' }
+  ]" />
+  <NavBar v-if="windowWidth > 750" :item-count="cartList.length" :buttons="[
+    { text: $t('app.navBarHomeButton'), icon: 'home.png', route: 'Home' },
+    { text: $t('app.navBarStoreButton'), icon: 'store.png', route: 'Store', subButtons: [{ text: $t('app.navBarProductsButton'), route: 'Store' }, { text: $t('app.navBarCartButton'), route: 'Cart' }] },
+    { text: $t('app.navBarInfoButton'), icon: 'info.png', route: 'FAQs', subButtons: [{ text: $t('app.navBarFAQsButton'), route: 'FAQs' }, { text: $t('app.navBarAboutUsButton'), route: 'AboutUs' }] }
+  ]" />
 
   <main>
     <router-view v-slot="{ Component }">
       <Transition name="fade" mode="out-in">
         <KeepAlive :include="['Store', 'Cart', 'Admin Panel']">
           <component :is="Component" :items-list="itemsList" :orders-list="ordersList" :cart-list="cartList"
-            :partners-list="partnersList" />
+            :partners-list="partnersList" :coupons-list="couponsList" :checkout-amount="checkoutAmount" />
         </KeepAlive>
       </Transition>
     </router-view>
   </main>
 
-  <footer>
+  <footer class="flex" v-if="windowWidth > 750">
 
   </footer>
 
@@ -37,18 +46,7 @@ export default {
   },
   data() {
     return {
-      mobileBarLinks: [
-        { text: "Home", route: "Home" },
-        { text: "Store", route: "Store" },
-        { text: "Cart", route: "Cart" },
-        { text: "FAQs", route: "Home" },
-        { text: "About us", route: "AboutUs" }
-      ],
-      navBarButtons: [
-        { text: 'Home', icon: 'home.png', route: 'Home' },
-        { text: 'Store', icon: 'store.png', route: 'Store', subButtons: [{ text: 'Products', route: 'Store' }, { text: 'Cart', route: 'Cart' }] },
-        { text: 'Info', icon: 'info.png', route: 'Home', subButtons: [{ text: 'FAQs', route: 'Home' }, { text: 'About us', route: 'AboutUs' }] }
-      ]
+      
     }
   },
   computed: {
@@ -64,10 +62,17 @@ export default {
     partnersList() {
       return store.getters.partners;
     },
+    couponsList() {
+      return store.getters.coupons;
+    },
+    checkoutAmount() {
+      return Number(store.getters.checkout);
+    }
   },
   async beforeCreate() {
     await store.dispatch('getItems');
     await store.dispatch('getPartners');
+    await store.dispatch('getCoupons');
   }
 }
 </script>

@@ -24,17 +24,28 @@ defineProps({
 
 <template>
     <div class="item-card flex">
-        <img class="item-photo" :src="itemInfo.photo" alt="Photo">
+        <img class="item-photo" :src="itemInfo.itemPhoto" alt="Photo">
         <div class="item-info-container flex column wide">
             <div class="flex column">
-                <h2 class="item-title">{{ itemInfo.title }}</h2>
-                <p class="item-short-description">{{ itemInfo.shortDescription }} <router-link
-                        :to="{ name: 'ItemDescription', params: { itemID: itemInfo.id } }" class="see-more-text">More
-                        info...</router-link></p>
-                <label class="item-price">${{ itemInfo.price.toFixed(2) }}</label>
-                <label class="negative-text" v-if="!itemInfo.itemAvailability">Currently unavailable</label>
+                <h2 class="item-title">{{ itemInfo.itemTitle }}</h2>
+                <p class="item-short-description">{{ itemInfo.itemShortDescription }} <router-link
+                        :to="{ name: 'ItemDescription', params: { itemID: itemInfo.id } }" class="see-more-text">{{
+                            $t('itemCard.moreInfo') }}</router-link></p>
+                <label class="item-price flex y-centered">
+                    <span :class="{ 'strikethrough': itemInfo.itemOnSale, 'negative-text': itemInfo.itemOnSale }">
+                        ${{ itemInfo.itemPrice.toFixed(2) }}
+                    </span>
+                    <span v-if="itemInfo.itemOnSale" style="margin-left: 5px;">
+                        ${{ itemInfo.itemPriceSale.toFixed(2) }}
+                    </span>
+                    <span v-if="itemInfo.itemOnSale" class="sale-tag flex x-centered y-centered">
+                        {{ $t('itemCard.saleTag') }}
+                    </span>
+                </label>
+                <label class="unavailability-text negative-text" v-if="!itemInfo.itemAvailability">{{
+                    $t('itemCard.unavailable') }}</label>
             </div>
-            <div class="flex y-centered space-between">
+            <div class="flex y-centered space-between top-margin">
                 <div class="quantity-container flex">
                     <button class="change-quantity-button centered-text" @click="changeCartQuantity(-1)"
                         :class="{ 'disabled': cartQuantity <= 1 }">-</button>
@@ -43,7 +54,7 @@ defineProps({
                         :class="{ 'disabled': cartQuantity >= 20 }">+</button>
                 </div>
                 <button class="action-button add-button" :class="{ 'disabled': !itemInfo.itemAvailability }"
-                    @click="addToCart(); animateAdd($event)">Add to cart</button>
+                    @click="addToCart(); animateAdd($event)">{{ $t('itemCard.addToCart') }}</button>
             </div>
         </div>
     </div>
@@ -73,11 +84,11 @@ export default {
         animateAdd(event) {
             event.target.classList.add("disabled");
             event.target.classList.add("added");
-            event.target.innerText = "Added!";
+            event.target.innerText = this.$t('itemCard.addedToCart');
             setTimeout(() => {
                 event.target.classList.remove("disabled");
                 event.target.classList.remove("added");
-                event.target.innerText = "Add to cart";
+                event.target.innerText = this.$t('itemCard.addToCart');
             }, 1500);
         }
     }
@@ -87,7 +98,7 @@ export default {
 <style scoped>
 .item-card {
     justify-content: left;
-    margin: 4px 0 4px 0;
+    margin: 5px 0 5px 0;
     padding: 3%;
     border: 2px solid var(--pale-tone);
     background-color: var(--dark-grey);
@@ -97,6 +108,7 @@ export default {
 
 .item-photo {
     width: 35%;
+    min-width: 125px;
     max-width: 160px;
     max-height: 140px;
     border-radius: 4px;
@@ -128,7 +140,18 @@ export default {
     color: var(--pale-tone);
 }
 
-.negative-text {
+.sale-tag {
+    margin-left: 7px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    height: 25px;
+    padding: 0 5px 0 5px;
+    border-radius: 3px;
+    background: var(--red-brown);
+    color: var(--white-soft);
+}
+
+.unavailability-text {
     font-size: 12px;
 }
 
@@ -167,7 +190,7 @@ export default {
     padding-block: 1px;
     transition: all 0.2s;
     cursor: pointer;
-    
+
 }
 
 .add-button {
@@ -178,6 +201,7 @@ export default {
     padding-inline: 0;
     max-width: 200px;
     transition: all 0.2s;
+    line-height: 12px;
 }
 
 .add-button.added {

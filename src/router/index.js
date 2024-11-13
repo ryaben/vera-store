@@ -9,6 +9,7 @@ import Checkout from "/src/views/Checkout.vue";
 import Order from "/src/views/Order.vue";
 import ItemDescription from "/src/views/ItemDescription.vue";
 import AdminPanel from "/src/views/AdminPanel.vue";
+import FAQs from "/src/views/FAQs.vue";
 
 //Rutas
 const routes = [
@@ -54,6 +55,11 @@ const routes = [
     name: "AdminPanel",
     component: AdminPanel
   },
+  {
+    path: "/faqs",
+    name: "FAQs",
+    component: FAQs
+  }
 ];
 
 const router = createRouter({

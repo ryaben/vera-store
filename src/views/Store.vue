@@ -2,8 +2,10 @@
 import store from '../store';
 import ItemCard from '../components/ItemCard.vue';
 import Multiselect from 'vue-multiselect';
+import VueToggle from "vue-toggle-component";
+import TabSelector from '../components/TabSelector.vue';
 import { useWindowSize } from 'vue-window-size';
-const { width, height } = useWindowSize();
+const { width } = useWindowSize();
 const windowWidth = width;
 
 defineProps({
@@ -22,50 +24,69 @@ defineProps({
 
 <template>
     <section class="page-section">
-        <div class="store-container flex wide">
-            <div class="store-tools flex column">
-                <div class="flex column y-centered tab-wrapper">
+        <div class="store-container flex wide" :class="{ 'relocated': scrollYPosition > 80 }">
+            <div class="store-tools flex column" :class="{ 'floating': scrollYPosition > 80 }">
+                <TabSelector v-show="windowWidth <= 850" default-tab="search" @tab-selected="selectTab" :tab-list="[
+                    { identifier: 'search', tabTitle: $t('store.searchTabTitle') },
+                    { identifier: 'categories', tabTitle: $t('store.categoriesTabTitle') },
+                    { identifier: 'price', tabTitle: $t('store.priceTabTitle') },
+                    { identifier: 'availability', tabTitle: $t('store.availabilityTabTitle') }
+                ]" />
+                <div v-show="windowWidth > 850 || selectedTab === 'search'" class="flex column y-centered tab-wrapper">
                     <input type="search" id="itemSearch" class="bottom-margin" name="itemSearch"
-                        :class="{ 'active-search': filteredSearch }" placeholder="Search items..."
+                        :class="{ 'active-search': filteredSearch }" :placeholder="$t('store.searchPlaceholder')"
                         v-model="filteredSearch" @input="filterBySearch">
                 </div>
-
-                <div class="flex column y-centered tab-wrapper">
-                    <p class="tools-title bold">Categories</p>
+                <div v-show="windowWidth > 850 || selectedTab === 'categories'"
+                    class="flex column y-centered tab-wrapper">
+                    <p v-if="windowWidth > 850" class="tools-title bold">{{ $t('store.toolsTitle1') }}</p>
                     <Multiselect v-model="filteredCategories" :options="categoriesInItems" :multiple="true"
-                        select-label="Tap to select" deselect-label="Tap to remove" open-direction="below"
+                        :select-label="$t('store.categoriesSelectLabel')"
+                        :placeholder="$t('store.categoriesPlaceholder')"
+                        :deselect-label="$t('store.categoriesDeselectLabel')" open-direction="below"
                         @select="filterByCategory" @remove="filterByCategory" class="category-selector" />
                 </div>
-                <div class="flex column tab-wrapper">
-                    <p class="tools-title bold">Price</p>
+                <div v-show="windowWidth > 850 || selectedTab === 'price'" class="flex column tab-wrapper">
+                    <p v-if="windowWidth > 850" class="tools-title bold">{{ $t('store.toolsTitle2') }}</p>
                     <label class="tab-label" for="itemMinPrice">
                         <input class="item-price" type="number" name="itemPrice" v-model="filteredPrice.min"
-                            placeholder="Min." min="1" @input="fixPrices(); filterByPrice" @change="fixPrices(); filterByPrice()">
+                            :placeholder="$t('store.itemPricePlaceholder1')" min="1" @input="fixPrices(); filterByPrice"
+                            @change="fixPrices(); filterByPrice()">
                         &nbsp;—&nbsp;
                         <input class="item-price" type="number" name="itemPrice" v-model="filteredPrice.max"
-                            placeholder="Max." min="1" @input="fixPrices(); filterByPrice" @change="fixPrices(); filterByPrice()">
+                            :placeholder="$t('store.itemPricePlaceholder2')" min="1" @input="fixPrices(); filterByPrice"
+                            @change="fixPrices(); filterByPrice()">
                     </label>
                 </div>
-                <div class="store-stats">
-                    <p class="products-amount centered-text"><b class="bold">{{ itemsList.length }}</b> products in the
-                        store.
-                    </p>
+                <div v-show="windowWidth > 850 || selectedTab === 'availability'" class="flex tab-wrapper"
+                    :class="{ 'x-centered': windowWidth < 850 }">
+                    <VueToggle id="availabilityToggle" :title="$t('store.availabilityToggle')" name="itemAvailability"
+                        font-size="16px" active-color="var(--intense-brown)" :toggled="availabilityToggle"
+                        @toggle="toggleAvailability" />
                 </div>
             </div>
             <div class="loading-gif flex column x-centered y-centered top-margin" v-if="!itemsList.length">
                 <img class="loading-image" src="/img/loading.gif" alt="Loading">
-                <p>Loading items...</p>
+                <p>{{ $t('store.loading') }}</p>
             </div>
             <Transition name="fade">
                 <div v-if="itemsList.length" id="resultsContainer" class="flex column wide">
                     <div class="display-tools flex y-centered wide space-between bottom-margin">
                         <label for="itemsPerPage">
-                            <span class="bold">Items/page: </span><input type="number" id="itemsPerPage" min="1"
-                                max="500" v-model="itemsPerPage" @input="pageElements">
+                            <span class="bold">{{ $t('store.itemsPerPage') }}&nbsp;</span><input type="number"
+                                id="itemsPerPage" min="1" max="500" v-model="itemsPerPage" @input="pageElements">
                         </label>
-                        <Multiselect v-model="selectedSort" :options="sortOptions" open-direction="below" label="label"
-                            @select="sortItems" :searchable="false" :select-label="''" :deselect-label="''"
-                            :allow-empty="false" class="sort-selector" />
+                        <Multiselect v-model="selectedSort" open-direction="below" label="label" @select="sortItems"
+                            :searchable="false" :select-label="''" :deselect-label="''" :allow-empty="false"
+                            class="sort-selector" :options="[
+                                { label: $t('store.sortingOption1'), value: 'none' },
+                                { label: $t('store.sortingOption2'), value: 'ascendingOrder' },
+                                { label: $t('store.sortingOption3'), value: 'descendingOrder' },
+                                { label: $t('store.sortingOption4'), value: 'mostPopular' },
+                                { label: $t('store.sortingOption5'), value: 'lowestPrice' },
+                                { label: $t('store.sortingOption6'), value: 'highestPrice' },
+                                { label: $t('store.sortingOption7'), value: 'random' }
+                            ]" />
                     </div>
                     <Transition name="fade">
                         <div :key="componentKey">
@@ -73,8 +94,16 @@ defineProps({
                                 :item-info="item" :cart="cartList" />
                         </div>
                     </Transition>
-                    <p class="top-margin" v-if="itemsList.length && !pagedElements.length">There are no matching results
-                        for the filters applied.</p>
+                    <p class="top-margin centered-text" v-if="itemsList.length && !visibleElements.length">
+                        {{ $t('store.noResults') }}
+                    </p>
+                    <div class="pages-container flex column y-centered top-margin">
+                        <label for="">{{ $t('store.pageControl') }}</label>
+                        <vue-awesome-paginate :total-items="visibleElements.length" :items-per-page="itemsPerPage"
+                            :max-pages-shown="3" v-model="currentPage" :show-ending-buttons="true"
+                            first-page-content="<<" last-page-content=">>" :show-breakpoint-buttons="false"
+                            :hide-prev-next-when-ends="true" @click="setPage" />
+                    </div>
                 </div>
             </Transition>
         </div>
@@ -85,10 +114,11 @@ defineProps({
 export default {
     name: 'Store',
     components: {
-        ItemCard, Multiselect
+        ItemCard, Multiselect, TabSelector, VueToggle
     },
     data() {
         return {
+            availabilityToggle: false,
             componentKey: 0,
             maxTotalLoad: 1000,
             filteredSearch: '',
@@ -97,20 +127,12 @@ export default {
                 min: "",
                 max: ""
             },
-            selectedTab: 'category',
+            selectedTab: 'search',
             productsSorting: "none",
-            itemsPerPage: 20,
+            itemsPerPage: 15,
             currentPage: 1,
-            sortOptions: [
-                { label: "No sorting", value: "none" },
-                { label: "Alphabet (A to Z)", value: "ascendingOrder" },
-                { label: "Alphabet (Z to A)", value: "descendingOrder" },
-                { label: "Most popular", value: "mostPopular" },
-                { label: "Price (lowest)", value: "lowestPrice" },
-                { label: "Price (highest)", value: "highestPrice" },
-                { label: "Random", value: "random" }
-            ],
-            selectedSort: { label: "No sorting", value: "none" }
+            selectedSort: { label: this.$t('store.sortingOption1'), value: "none" },
+            scrollYPosition: 0
         }
     },
     watch: {
@@ -139,16 +161,21 @@ export default {
             return categories;
         },
         visibleElements() {
-            return this.itemsList.filter(element => element.searchDisplay && element.categoryDisplay && element.priceDisplay && element.availabilityDisplay);
+            return this.itemsList.filter(element => !element.itemHidden && element.searchDisplay && element.categoryDisplay && element.priceDisplay && element.availabilityDisplay);
         },
         pagedElements() {
-            return this.itemsList.filter(element => element.pageDisplay && element.searchDisplay && element.categoryDisplay && element.priceDisplay && element.availabilityDisplay);
+            return this.itemsList.filter(element => !element.itemHidden && element.pageDisplay && element.searchDisplay && element.categoryDisplay && element.priceDisplay && element.availabilityDisplay);
         },
         totalPages() {
-            return Math.ceil(this.visibleElements.length / this.itemsPerPage);
+            let pages = Math.ceil(this.visibleElements.length / this.itemsPerPage);
+            return pages === 0 ? 1 : pages;
         },
     },
     methods: {
+        toggleAvailability(value) {
+            this.availabilityToggle = value;
+            this.filterByAvailability();
+        },
         setPage(result) {
             this.currentPage = result;
             this.pageElements();
@@ -172,6 +199,8 @@ export default {
 
             if (this.currentPage > this.totalPages) {
                 this.currentPage = this.totalPages;
+            } else if (this.currentPage < 0) {
+                this.currentPage = 1;
             }
             if (this.itemsPerPage < 1) {
                 this.itemsPerPage = 1;
@@ -184,18 +213,18 @@ export default {
         sortItems() {
             switch (this.selectedSort.value) {
                 case 'ascendingOrder':
-                    this.itemsList.sort((a, b) => (this.normalizeString(a.title) > this.normalizeString(b.title)) ? 1 : -1);
+                    this.itemsList.sort((a, b) => (this.normalizeString(a.itemTitle) > this.normalizeString(b.itemTitle)) ? 1 : -1);
                     break;
                 case 'descendingOrder':
-                    this.itemsList.sort((a, b) => (this.normalizeString(a.title) > this.normalizeString(b.title)) ? 1 : -1);
+                    this.itemsList.sort((a, b) => (this.normalizeString(a.itemTitle) > this.normalizeString(b.itemTitle)) ? 1 : -1);
                     this.itemsList.reverse();
                     break;
                 case 'highestPrice':
-                    this.itemsList.sort((a, b) => (a.price > b.price) ? 1 : -1);
+                    this.itemsList.sort((a, b) => ((a.itemOnSale ? a.itemPriceSale : a.itemPrice) > (b.itemOnSale ? b.itemPriceSale : b.itemPrice)) ? 1 : -1);
                     this.itemsList.reverse();
                     break;
                 case 'lowestPrice':
-                    this.itemsList.sort((a, b) => (a.price > b.price) ? 1 : -1);
+                    this.itemsList.sort((a, b) => ((a.itemOnSale ? a.itemPriceSale : a.itemPrice) > (b.itemOnSale ? b.itemPriceSale : b.itemPrice)) ? 1 : -1);
                     break;
                 case 'random':
                     this.shuffleArray(this.itemsList);
@@ -215,7 +244,7 @@ export default {
                 });
             } else {
                 this.itemsList.forEach(function (element) {
-                    const entryCurated = that.normalizeString(element.title.toLowerCase());
+                    const entryCurated = that.normalizeString(element.itemTitle.toLowerCase());
                     const searchCurated = that.normalizeString(that.filteredSearch.toLowerCase());
 
                     if (!entryCurated.includes(searchCurated)) {
@@ -248,7 +277,22 @@ export default {
             const maxPrice = this.filteredPrice.max === '' ? Infinity : this.filteredPrice.max;
 
             this.itemsList.forEach(function (element) {
-                element.price >= minPrice && element.price <= maxPrice ? element.priceDisplay = true : element.priceDisplay = false;
+                element.itemPrice >= minPrice && element.itemPrice <= maxPrice ? element.priceDisplay = true : element.priceDisplay = false;
+            });
+
+            this.pageElements();
+        },
+        filterByAvailability() {
+            const that = this;
+
+            this.itemsList.forEach(function (element) {
+                if (!that.availabilityToggle) {
+                    element.availabilityDisplay = true;
+                } else if (that.availabilityToggle && element.itemAvailability) {
+                    element.availabilityDisplay = true;
+                } else if (that.availabilityToggle && !element.itemAvailability) {
+                    element.availabilityDisplay = false;
+                }
             });
 
             this.pageElements();
@@ -259,6 +303,9 @@ export default {
                 [array[i], array[j]] = [array[j], array[i]];
             }
         },
+        selectTab(index) {
+            this.selectedTab = index;
+        },
         arrayContainsAny(array1, array2) {
             return array1.some(item => array2.includes(item));
         },
@@ -268,7 +315,15 @@ export default {
     },
     mounted() {
         if (this.itemsList.length) this.pageElements();
-    }
+
+        const that = this;
+        window.addEventListener("scroll", (event) => {
+            that.scrollYPosition = window.scrollY;
+        });
+    },
+    beforeDestroy() {
+        window.removeEventListener("scroll", this.onScroll);
+    },
 }
 </script>
 
@@ -280,7 +335,11 @@ export default {
 }
 
 .store-container {
+    position: relative;
     flex-direction: column;
+}
+.store-container.relocated {
+    justify-content: right;
 }
 
 .loading-gif {
@@ -293,7 +352,18 @@ export default {
     background-color: var(--light-brown);
     border-radius: 6px;
     padding: 10px;
-    margin-bottom: 15px;
+    margin-bottom: 25px;
+}
+
+.store-tools.floating {
+    position: fixed;
+    width: 27%;
+    top: 2vw;
+    left: 2vw;
+}
+
+div.section-selector-container {
+    margin-bottom: 20px;
 }
 
 .tools-title {
@@ -307,6 +377,7 @@ export default {
 }
 
 .item-price {
+    position: relative;
     font-size: 16px;
     width: 37%;
     max-width: 100px;
@@ -315,6 +386,12 @@ export default {
     color: var(--black-mute);
     border-radius: 8px;
     border: 2px solid var(--light-brown);
+}
+
+.item-price::before {
+    display: block;
+    content: '$';
+    position: absolute;
 }
 
 .item-price,
@@ -326,7 +403,7 @@ export default {
     position: relative;
     width: 100%;
     max-width: 500px;
-    height: 32px;
+    height: 40px;
     margin: 2px auto 5px auto;
     border: 2px solid var(--soft-brown);
     border-radius: 8px;
@@ -379,12 +456,20 @@ export default {
     max-width: 300px;
 }
 
-@media (prefers-color-scheme: light) {
-    .products-amount {
-        border-color: var(--black-soft);
-    }
+#itemavailability-label {
+    pointer-events: none;
+}
 
-    .display-tools {
+.pages-container {
+    padding-top: 8px;
+    border-top: 1px solid var(--white-soft);
+}
+
+@media (prefers-color-scheme: light) {
+
+    .products-amount,
+    .display-tools,
+    .pages-container {
         border-color: var(--black-soft);
     }
 }
@@ -415,7 +500,8 @@ export default {
         margin-bottom: 20px;
     }
 
-    .tab-wrapper:last-of-type {
+    .tab-wrapper:last-child {
+        margin-top: 5px;
         margin-bottom: 0;
     }
 
@@ -428,9 +514,13 @@ export default {
     }
 
     #resultsContainer {
-        padding-left: 3%;
+        padding-left: 40px;
         width: 70%;
         margin-top: -4px;
+    }
+
+    #availabilityToggle {
+        margin-top: 5px;
     }
 }
 
@@ -439,4 +529,6 @@ export default {
         border-color: var(--black-soft);
     }
 }
+
+@media only screen and (max-width: 850px) {}
 </style>

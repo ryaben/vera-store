@@ -36,99 +36,112 @@ defineProps({
         <div class="form-view-container-left flex column x-centered y-centered" v-if="formType !== 'order'">
             <button class="action-button corner-button" :class="{ 'disabled': !formInfo.id }"
                 @click="deleteElement">❌</button>
-            <label>Delete</label>
+            <label>{{ $t('panelForm.delete') }}</label>
         </div>
         <div class="form-view-container-right flex column x-centered y-centered" v-if="formType !== 'order'">
             <button class="action-button corner-button" :class="{ 'selected': formAdd }"
                 @click="toggleFormAdd">➕</button>
-            <label>New</label>
+            <label>{{ $t('panelForm.new') }}</label>
         </div>
 
         <p class="id-title">
-            <span v-if="formType === 'order'">Order</span>
-            <span v-if="formType === 'item'">Item</span>
-            <span v-if="formType === 'partner'">Partner</span>:
+            <span v-if="formType === 'order'">{{ $t('panelForm.formTitle1') }}</span>
+            <span v-if="formType === 'item'">{{ $t('panelForm.formTitle2') }}</span>
+            <span v-if="formType === 'partner'">{{ $t('panelForm.formTitle3') }}</span>
+            <span v-if="formType === 'coupon'">{{ $t('panelForm.formTitle4') }}</span>
             <br>
-            <router-link v-if="formType === 'order' && !formAdd" class="bold" :to="'/order/' + formInfo.id">{{
-                formInfo.id
-                }}</router-link>
-            <router-link v-if="formType === 'item' && !formAdd" class="bold" :to="'/store/' + formInfo.id">{{
-                formInfo.id
-                }}</router-link>
-        <p v-if="formType === 'partner' && !formAdd" class="bold" style="margin-bottom: 0;">{{ formInfo.id }}</p>
-        <span v-if="formAdd">New ID will be generated.</span>
+            <router-link v-if="formType === 'order' && !formAdd" class="bold" :to="'/order/' + formInfo.id">
+                {{ formInfo.id }}
+            </router-link>
+            <router-link v-if="formType === 'item' && !formAdd" class="bold" :to="'/store/' + formInfo.id">
+                {{ formInfo.id }}
+            </router-link>
+        <p v-if="(formType === 'partner' || formType === 'coupon') && !formAdd" class="bold" style="margin-bottom: 0;">
+            {{ formInfo.id }}
+        </p>
+        <span v-if="formAdd">{{ $t('panelForm.newID') }}</span>
         </p>
 
         <form class="flex column wide" v-if="formType === 'order'" @submit.prevent="updateOrder">
             <div class="flex column y-centered">
-                <label for="orderStatus" class="field-label flex x-centered wide">Status:&nbsp;
+                <label for="orderStatus" class="field-label flex x-centered wide">{{ $t('panelForm.status') }}&nbsp;
                     <select name="orderStatus" id="orderStatus" class="form-field" v-model="formInfo.orderStatus">
-                        <option value="0">Issued</option>
-                        <option value="1">Ready</option>
-                        <option value="2">Paid</option>
-                        <option value="3">Delivered</option>
+                        <option value="0">{{ $t('global.status0Title') }}</option>
+                        <option value="1">{{ $t('global.status1Title') }}</option>
+                        <option value="2">{{ $t('global.status2Title') }}</option>
+                        <option value="3">{{ $t('global.status3Title') }}</option>
                     </select>
                 </label>
             </div>
             <label class="flex column wide y-centered top-margin">
-                Internal notes:
+                {{ $t('panelForm.internalNotes') }}
                 <textarea rows="6" class="field-textarea" name="orderNotes" v-model="formInfo.orderNotes"></textarea>
             </label>
-            <p class="form-subtitle bold">Items included:</p>
+            <p class="form-subtitle bold">{{ $t('panelForm.itemsIncluded') }}</p>
             <div class="flex column">
                 <p class="item-count" v-for="(item, i) in differentItemsInCart" :key="i">
-                    • {{ item.amount }} x {{ itemsList.find((el) => { return el.id === item.id }).title }}
+                    • {{ item.amount }} x {{ itemsList.find((el) => { return el.id === item.id }).itemTitle }}
                 </p>
             </div>
             <label class="flex x-centered" for="orderPrice">
-                Total:&nbsp;
+                {{ $t('panelForm.total') }}&nbsp;
                 <select name="orderCurrency" id="currencySelector" v-model="formInfo.orderCurrency">
                     <option value="usd">USD</option>
                     <option value="ars">ARS</option>
                 </select>
                 <input v-model="formInfo.orderPrice" id="orderPrice" class="form-field number" type="number" step=".01">
             </label>
-            <p class="form-subtitle bold">Customer info:</p>
+            <p class="form-subtitle bold">{{ $t('panelForm.customerInfo') }}</p>
             <div class="flex column y-centered">
-                <label for="customerName" class="field-label flex x-centered wide">Name:&nbsp;<input
-                        v-model="formInfo.customer.name" id="customerName" class="form-field" type="text"></label>
-                <label for="customerEmail" class="field-label flex x-centered wide">Email:&nbsp;<input
-                        v-model="formInfo.customer.email" id="customerEmail" class="form-field" type="text"></label>
+                <label for="customerName" class="field-label flex x-centered wide">{{ $t('panelForm.name')
+                    }}&nbsp;<input v-model="formInfo.customer.name" id="customerName" class="form-field"
+                        type="text"></label>
+                <label for="customerEmail" class="field-label flex x-centered wide">{{ $t('panelForm.email')
+                    }}&nbsp;<input v-model="formInfo.customer.email" id="customerEmail" class="form-field"
+                        type="text"></label>
             </div>
-            <p class="form-subtitle bold">Payment:</p>
+            <p class="form-subtitle bold">{{ $t('panelForm.payment') }}</p>
             <div class="flex column y-centered">
-                <label for="paymentMethod" class="field-label flex x-centered wide">Method:&nbsp;
+                <label for="paymentMethod" class="field-label flex x-centered wide">{{ $t('panelForm.method') }}&nbsp;
                     <select name="paymentMethod" id="paymentMethod" class="form-field" v-model="formInfo.paymentMethod">
-                        <option value="cash">Cash</option>
+                        <option value="cash">{{ $t('panelForm.cash') }}</option>
                         <option value="card">Payoneer</option>
                     </select>
                 </label>
-                <label for="paymentLink" class="field-label flex x-centered wide">Link:&nbsp;<input
+                <label for="paymentLink" class="field-label flex x-centered wide">{{ $t('panelForm.link') }}&nbsp;<input
                         v-model="formInfo.paymentLink" id="paymentLink" class="form-field" type="url"></label>
             </div>
             <input type="submit" class="submit-button action-button large" :class="{ 'disabled': !formInfo.id }"
-                value="Update order">
+                :value="$t('panelForm.updateOrder')">
         </form>
 
         <form class="flex column wide" v-if="formType === 'item'"
             @submit.prevent="formAdd ? createItem() : updateItem()">
             <label class="flex wide x-centered bottom-margin" for="itemTitle">
-                Title:&nbsp;
-                <input v-model="formInfo.title" id="itemTitle" class="form-field" type="text">
+                {{ $t('panelForm.title') }}&nbsp;
+                <input v-model="formInfo.itemTitle" id="itemTitle" class="form-field" type="text" required>
             </label>
             <div class="flex column wide y-centered">
-                <img class="item-photo" :src="formInfo.photo" alt="Photo">
+                <img class="item-photo" :src="formInfo.itemPhoto" alt="Photo">
                 <input id="photoFile" type="file" @input="previewImage" accept="image/png">
             </div>
-            <label class="flex x-centered top-margin bottom-margin" for="itemPrice">Price:&nbsp;<input
-                    v-model="formInfo.price" id="itemPrice" class="form-field number" type="number" step=".01">
-            </label>
+            <div class="flex x-centered top-margin bottom-margin">
+                <label class="flex right right-margin" for="itemPrice">{{ $t('panelForm.price')
+                    }}&nbsp;<input v-model="formInfo.itemPrice" id="itemPrice" class="form-field number" type="number"
+                        step=".01" required>
+                </label>
+                <label class="flex left" for="itemPriceSale">{{ $t('panelForm.priceSale')
+                    }}&nbsp;<input v-model="formInfo.itemPriceSale" id="itemPriceSale" class="form-field number"
+                        type="number" step=".01">
+                </label>
+            </div>
             <label class="flex column wide y-centered bottom-margin">
-                Categories:
+                {{ $t('panelForm.categories') }}
                 <div class="flex">
-                    <input type="text" v-model="categoryValue" placeholder="Input a category for the item">
+                    <input type="text" v-model="categoryValue" :placeholder="$t('panelForm.categoriesPlaceholder')">
                     <div class="action-button flex x-centered y-centered" style="margin-left: 10px;"
-                        @click.native.stop="addValue(categoryValue, formInfo.itemCategories)">Add</div>
+                        @click.native.stop="addValue(categoryValue, formInfo.itemCategories); categoryValue = ''">{{
+                            $t('panelForm.add') }}</div>
                 </div>
                 <div class="flex">
                     <SelectedValue class="selection margin-top" v-for="(value, i) in formInfo.itemCategories" :key="i"
@@ -136,58 +149,153 @@ defineProps({
                 </div>
             </label>
             <label class="flex column wide y-centered">
-                Short description:
+                {{ $t('panelForm.shortDescription') }}
                 <textarea rows="3" class="field-textarea" name="shortDescription"
-                    v-model="formInfo.shortDescription"></textarea>
+                    v-model="formInfo.itemShortDescription"></textarea>
             </label>
             <label class="flex column wide y-centered top-margin bottom-margin">
-                Long description:
+                {{ $t('panelForm.longDescription') }}
                 <textarea rows="6" class="field-textarea" name="longDescription"
-                    v-model="formInfo.longDescription"></textarea>
+                    v-model="formInfo.itemLongDescription"></textarea>
             </label>
-            <label class="flex wide x-centered" for="itemAvailability">
-                <input id="itemAvailability" type="checkbox" v-model="formInfo.itemAvailability">
-                Available
-            </label>
+            <div class="flex space-evenly">
+                <label class="flex x-centered" for="itemAvailability">
+                    <input id="itemAvailability" type="checkbox" v-model="formInfo.itemAvailability">
+                    {{ $t('panelForm.available') }}
+                </label>
+                <label class="flex x-centered" for="itemOnSale">
+                    <input id="itemOnSale" type="checkbox" v-model="formInfo.itemOnSale">
+                    {{ $t('panelForm.onSale') }}
+                </label>
+                <label class="flex x-centered" for="itemHidden">
+                    <input id="itemHidden" type="checkbox" v-model="formInfo.itemHidden">
+                    {{ $t('panelForm.hidden') }}
+                </label>
+            </div>
             <input type="submit" class="submit-button action-button large"
-                :class="{ 'disabled': !formInfo.id && !formAdd }" :value="formAdd ? 'Add new item' : 'Update item'">
+                :class="{ 'disabled': !formInfo.id && !formAdd }"
+                :value="formAdd ? $t('panelForm.addNewItem') : $t('panelForm.updateItem')">
         </form>
 
         <form class="flex column wide" v-if="formType === 'partner'"
-            @submit.prevent="formAdd ? createPartner() : updatePartner">
+            @submit.prevent="formAdd ? createPartner() : updatePartner()">
             <div class="flex column y-centered">
-                <p class="bold">Property:</p>
-                <label class="field-label flex x-centered" for="partnerPropertyName">Name:&nbsp;<input
-                        v-model="formInfo.partnerPropertyName" id="partnerPropertyName" class="form-field"
-                        type="text"></label>
-                <label class="flex x-centered bottom-margin" for="partnerAddress">Address:&nbsp;<input
-                        v-model="formInfo.partnerAddress" id="partnerAddress" class="form-field" type="text"></label>
-                <MapboxMap :height="'40vh'" :width="'90%'" :mode="'picker'" :marker-position="markerPosition"
-                    @dragged-marker="draggedMarker" />
+                <p class="bold">{{ $t('panelForm.property') }}</p>
+                <label class="field-label flex x-centered" for="partnerPropertyName">{{ $t('panelForm.propertyName')
+                    }}&nbsp;<input v-model="formInfo.partnerPropertyName" id="partnerPropertyName" class="form-field"
+                        type="text" required></label>
+                <label class="flex x-centered bottom-margin" for="partnerAddress">{{ $t('panelForm.address')
+                    }}&nbsp;<input v-model="formInfo.partnerAddress" id="partnerAddress" class="form-field" type="text"
+                        required></label>
+                <label class="flex column wide y-centered">
+                    {{ $t('panelForm.location') }}
+                    <MapboxMap :height="'40vh'" :width="'90%'" :mode="'picker'" :marker-position="markerPosition"
+                        @dragged-marker="draggedMarker" />
+                </label>
             </div>
-            <p class="form-subtitle bold">Owner's contact:</p>
+            <p class="form-subtitle bold">{{ $t('panelForm.ownerContact') }}</p>
             <div class="flex column y-centered">
-                <label for="partnerName" class="field-label flex x-centered wide">Name:&nbsp;<input
-                        v-model="formInfo.partnerName" id="partnerName" class="form-field" type="text"></label>
-                <label for="partnerEmail" class="field-label flex x-centered wide">Email:&nbsp;<input
-                        v-model="formInfo.partnerEmail" id="partnerEmail" class="form-field" type="email"></label>
-                <label for="partnerPhone" class="field-label flex x-centered wide">Phone:&nbsp;<input
-                        v-model="formInfo.partnerPhone" id="partnerPhone" class="form-field" type="tel"></label>
+                <label for="partnerName" class="field-label flex x-centered wide">{{ $t('panelForm.ownerName')
+                    }}&nbsp;<input v-model="formInfo.partnerName" id="partnerName" class="form-field"
+                        type="text"></label>
+                <label for="partnerEmail" class="field-label flex x-centered wide">{{ $t('panelForm.ownerEmail')
+                    }}&nbsp;<input v-model="formInfo.partnerEmail" id="partnerEmail" class="form-field"
+                        type="email"></label>
+                <label for="partnerPhone" class="field-label flex x-centered wide">{{ $t('panelForm.phone')
+                    }}&nbsp;<input v-model="formInfo.partnerPhone" id="partnerPhone" class="form-field"
+                        type="tel"></label>
             </div>
             <div class="flex x-centered top-margin space-evenly">
                 <label class="flex x-centered" for="partnerActivity">
                     <input id="partnerActivity" type="checkbox" v-model="formInfo.partnerActivity">
-                    Active
+                    {{ $t('panelForm.active') }}
                 </label>
                 <label class="flex x-centered" for="partnerPrivacy">
                     <input id="partnerPrivacy" type="checkbox" v-model="formInfo.partnerPrivacy">
-                    Private
+                    {{ $t('panelForm.private') }}
                 </label>
             </div>
 
             <input type="submit" class="submit-button action-button large"
                 :class="{ 'disabled': !formInfo.id && !formAdd }"
-                :value="formAdd ? 'Add new partner' : 'Update partner'">
+                :value="formAdd ? $t('panelForm.addNewPartner') : $t('panelForm.updatePartner')">
+        </form>
+
+        <form class="flex column wide" v-if="formType === 'coupon'"
+            @submit.prevent="formAdd ? createCoupon() : updateCoupon()">
+            <label class="flex wide x-centered" for="couponCode">
+                {{ $t('panelForm.code') }}&nbsp;
+                <input v-model="formInfo.couponCode" id="couponCode" class="form-field" type="text" required>
+            </label>
+
+            <div class="flex column y-centered x-centered">
+                <p class="form-subtitle bold">{{ $t('panelForm.discount') }}</p>
+
+                <div class="flex wide x-centered y-centered bottom-margin">
+                    <label class="flex right" for="couponType">
+                        {{ $t('panelForm.type') }}&nbsp;
+                        <select v-model="formInfo.couponType" class="right-margin" name="couponType" id="couponType"
+                            required>
+                            <option value="fixed">{{ $t('panelForm.couponType1') }}</option>
+                            <option value="percentage">{{ $t('panelForm.couponType2') }}</option>
+                        </select>
+                    </label>
+                    <label class="flex left" for="couponAmount">
+                        <span class="left-margin">{{ $t('panelForm.amount') }}&nbsp;</span>
+                        <span v-if="formInfo.couponType === 'fixed'">$&nbsp;</span>
+                        <span v-if="formInfo.couponType === 'percentage'">%&nbsp;</span>
+                        <input v-model="formInfo.couponAmount" id="couponAmount" min="1" max="99" class="form-field"
+                            type="number" required>
+                    </label>
+                </div>
+                <div class="flex column wide x-centered y-centered">
+                    <label class="flex left bottom-margin" for="couponAppliesOn">
+                        <span>{{ $t('panelForm.appliesOn') }}&nbsp;</span>
+                        <select v-model="formInfo.couponAppliesOn" name="couponAppliesOn" id="couponAppliesOn" required>
+                            <option value="cart">{{ $t('panelForm.couponDiscountOn1') }}</option>
+                            <option value="itemsByID">{{ $t('panelForm.couponDiscountOn2') }}</option>
+                            <option value="itemsByCategory">{{ $t('panelForm.couponDiscountOn3') }}</option>
+                        </select>
+                    </label>
+                    <label
+                        v-if="formInfo.couponAppliesOn === 'itemsByID' || formInfo.couponAppliesOn === 'itemsByCategory'"
+                        class="flex column wide y-centered bottom-margin">
+                        <div class="flex">
+                            <input type="text" v-model="couponApplyValue"
+                                :placeholder="$t('panelForm.applyPlaceholder')">
+                            <div class="action-button flex x-centered y-centered" style="margin-left: 10px;"
+                                @click.native.stop="addValue(couponApplyValue, formInfo.couponAppliesOnItems); couponApplyValue = ''">
+                                {{ $t('panelForm.add') }}
+                            </div>
+                        </div>
+                        <div class="flex">
+                            <SelectedValue class="selection margin-top"
+                                v-for="(value, i) in formInfo.couponAppliesOnItems" :key="i" :lang-text="value"
+                                @remove-value="removeValue(value, formInfo.couponAppliesOnItems)" />
+                        </div>
+                    </label>
+                    <p class="form-subtitle bold">{{ $t('panelForm.otherProperties') }}&nbsp;</p>
+                    <label class="flex wide x-centered bottom-margin" for="couponMinimumSpend">
+                        {{ $t('panelForm.minimumSpend') }}&nbsp;
+                        <input v-model="formInfo.couponMinimumSpend" id="couponMinimumSpend" class="form-field number"
+                            min="0" type="number" required>
+                    </label>
+                    <div class="flex x-centered y-centered">
+                        <label class="flex x-centered y-centered right-margin" for="couponIncludeSaleItems">
+                            <input id="couponIncludeSaleItems" type="checkbox"
+                                v-model="formInfo.couponIncludeSaleItems">
+                            {{ $t('panelForm.includeSaleItems') }}
+                        </label>
+                        <label class="flex x-centered y-centered" for="couponActive">
+                            <input id="couponActive" type="checkbox" v-model="formInfo.couponActive">
+                            {{ $t('panelForm.couponActive') }}
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <input type="submit" class="submit-button action-button large"
+                :class="{ 'disabled': !formInfo.id && !formAdd }"
+                :value="formAdd ? $t('panelForm.addNewCoupon') : $t('panelForm.updateCoupon')">
         </form>
     </div>
 </template>
@@ -202,6 +310,7 @@ export default {
         return {
             photoSource: '',
             categoryValue: "",
+            couponApplyValue: "",
             formAdd: false
         }
     },
@@ -227,8 +336,8 @@ export default {
     methods: {
         previewImage(event) {
             this.photoSource = event.target.files[0];
-            this.formInfo.photo = URL.createObjectURL(this.photoSource);
-            this.updateItemPhoto();
+            this.formInfo.itemPhoto = URL.createObjectURL(this.photoSource);
+            this.formAdd === false ? this.updateItemPhoto() : console.log("Image not uploaded because it's new item.");
         },
         async updateItem() {
             const that = this;
@@ -237,10 +346,13 @@ export default {
             await updateDoc(itemRef, {
                 itemAvailability: that.formInfo.itemAvailability,
                 itemCategories: that.formInfo.itemCategories,
-                longDescription: that.formInfo.longDescription,
-                price: that.formInfo.price,
-                shortDescription: that.formInfo.shortDescription,
-                title: that.formInfo.title
+                itemLongDescription: that.formInfo.itemLongDescription,
+                itemOnSale: that.formInfo.itemOnSale,
+                itemHidden: that.formInfo.itemHidden,
+                itemPrice: that.formInfo.itemPrice,
+                itemPriceSale: that.formInfo.itemPriceSale,
+                itemShortDescription: that.formInfo.itemShortDescription,
+                itemTitle: that.formInfo.itemTitle
             });
 
             that.updateNotification();
@@ -252,7 +364,7 @@ export default {
             this.uploadPhoto(this.formInfo.id, 'items', function (fileName) {
                 that.generatePhotoReference(fileName, 'items', async function (photoReference) {
                     await updateDoc(itemRef, {
-                        photo: photoReference,
+                        itemPhoto: photoReference,
                     });
 
                     that.updatePhotoNotification();
@@ -269,11 +381,14 @@ export default {
                         itemPurchases: 0,
                         itemAvailability: that.formInfo.itemAvailability,
                         itemCategories: that.formInfo.itemCategories,
-                        longDescription: that.formInfo.longDescription,
-                        photo: photoReference,
-                        price: that.formInfo.price,
-                        shortDescription: that.formInfo.shortDescription,
-                        title: that.formInfo.title
+                        itemLongDescription: that.formInfo.itemLongDescription,
+                        itemPhoto: photoReference,
+                        itemOnSale: that.formInfo.itemOnSale,
+                        itemHidden: that.formInfo.itemHidden,
+                        itemPrice: that.formInfo.itemPrice,
+                        itemPriceSale: that.formInfo.itemPriceSale,
+                        itemShortDescription: that.formInfo.itemShortDescription,
+                        itemTitle: that.formInfo.itemTitle
                     });
 
                     that.addNotification();
@@ -282,6 +397,7 @@ export default {
         },
         async createPartner() {
             await addDoc(collection(db, "partners"), {
+                partnerPropertyName: this.formInfo.partnerPropertyName,
                 partnerAddress: this.formInfo.partnerAddress,
                 partnerLocation: new GeoPoint(this.markerPosition[1], this.markerPosition[0]),
                 partnerName: this.formInfo.partnerName,
@@ -293,20 +409,70 @@ export default {
 
             this.addNotification();
         },
+        async updatePartner() {
+            const that = this;
+            const partnerRef = doc(db, "partners", this.formInfo.id);
+
+            await updateDoc(partnerRef, {
+                partnerPropertyName: that.formInfo.partnerPropertyName,
+                partnerAddress: that.formInfo.partnerAddress,
+                partnerLocation: new GeoPoint(that.markerPosition[1], that.markerPosition[0]),
+                partnerName: that.formInfo.partnerName,
+                partnerEmail: that.formInfo.partnerEmail,
+                partnerPhone: that.formInfo.partnerPhone,
+                partnerActivity: that.formInfo.partnerActivity,
+                partnerPrivacy: that.formInfo.partnerPrivacy
+            });
+
+            this.updateNotification();
+        },
+        async createCoupon() {
+            await addDoc(collection(db, "coupons"), {
+                couponCode: this.formInfo.couponCode,
+                couponType: this.formInfo.couponType,
+                couponAmount: this.formInfo.couponAmount,
+                couponAppliesOn: this.formInfo.couponAppliesOn,
+                couponAppliesOnItems: this.formInfo.couponAppliesOnItems,
+                couponIncludeSaleItems: this.formInfo.couponIncludeSaleItems,
+                couponActive: this.formInfo.couponActive,
+                couponMinimumSpend: this.formInfo.couponMinimumSpend
+            });
+
+            this.addNotification();
+        },
+        async updateCoupon() {
+            const that = this;
+            const couponRef = doc(db, "coupons", this.formInfo.id);
+
+            await updateDoc(couponRef, {
+                couponCode: that.formInfo.couponCode,
+                couponType: that.formInfo.couponType,
+                couponAmount: that.formInfo.couponAmount,
+                couponAppliesOn: that.formInfo.couponAppliesOn,
+                couponAppliesOnItems: that.formInfo.couponAppliesOnItems,
+                couponIncludeSaleItems: that.formInfo.couponIncludeSaleItems,
+                couponActive: that.formInfo.couponActive,
+                couponMinimumSpend: that.formInfo.couponMinimumSpend
+            });
+
+            this.updateNotification();
+        },
         async updateOrder() {
+            const that = this;
             const orderRef = doc(db, "orders", this.formInfo.id);
 
             await updateDoc(orderRef, {
                 customer: {
-                    email: this.formInfo.customer.email,
-                    name: this.formInfo.customer.name
+                    email: that.formInfo.customer.email,
+                    name: that.formInfo.customer.name
                 },
-                orderItems: this.formInfo.orderItems,
-                orderNotes: this.formInfo.orderNotes,
-                orderPrice: this.formInfo.orderPrice,
-                orderStatus: Number(this.formInfo.orderStatus),
-                paymentLink: this.formInfo.paymentLink,
-                paymentMethod: this.formInfo.paymentMethod
+                orderCurrency: that.formInfo.orderCurrency,
+                orderItems: that.formInfo.orderItems,
+                orderNotes: that.formInfo.orderNotes,
+                orderPrice: that.formInfo.orderPrice,
+                orderStatus: Number(that.formInfo.orderStatus),
+                paymentLink: that.formInfo.paymentLink,
+                paymentMethod: that.formInfo.paymentMethod
             });
 
             this.updateNotification();
@@ -330,7 +496,7 @@ export default {
                 })
                 .catch((error) => {
                     notify({
-                        title: "Error on getting image",
+                        title: this.$t("panelForm.getImageError"),
                         text: error,
                         type: "error"
                     });
@@ -342,19 +508,25 @@ export default {
         async deleteElement() {
             const that = this;
 
-            if (confirm("This will permanently delete the entry and everything related to it. Do you want to proceed?")) {
+            if (confirm(this.$t("panelForm.deleteEntry"))) {
                 await deleteDoc(doc(db, `${this.formType}s`, this.formInfo.id));
-                const photoRef = ref(storage, "images/" + `${this.formType}s` + "/" + this.formInfo.id + ".png");
-                deleteObject(photoRef).then(() => {
-                    remoteDirectory.splice(entryIndex, 1);
-                    that.deleteNotification();
-                }).catch((error) => {
-                    notify({
-                        title: 'Element deletion',
-                        text: error,
-                        type: 'error'
-                    })
-                });
+
+                if (this.formType === 'item') {
+                    const photoRef = ref(storage, "images/" + `${this.formType}s` + "/" + this.formInfo.id + ".png");
+
+                    deleteObject(photoRef)
+                        .then(() => {
+                            return that.deleteNotification();
+                        }).catch((error) => {
+                            return notify({
+                                title: this.$t("panelForm.deleteNotificationTitle"),
+                                text: error,
+                                type: 'error'
+                            })
+                        });
+                }
+
+                this.deleteNotification();
             }
         },
         draggedMarker(newPosition) {
@@ -374,29 +546,29 @@ export default {
         },
         deleteNotification() {
             notify({
-                title: 'Element deletion',
-                text: 'The element was successfully deleted from the database.',
+                title: this.$t("panelForm.deleteNotificationTitle"),
+                text: this.$t("panelForm.deleteNotificationText"),
                 type: 'success'
             });
         },
         updateNotification() {
             notify({
-                title: "Update successful",
-                text: "The database entry was successfully updated!",
+                title: this.$t("panelForm.updateNotificationTitle"),
+                text: this.$t("panelForm.updateNotificationText"),
                 type: "success"
             });
         },
         updatePhotoNotification() {
             notify({
-                title: "Photo update successful",
-                text: "The item's photo was successfully updated!",
+                title: this.$t("panelForm.updatePhotoNotificationTitle"),
+                text: this.$t("panelForm.updatePhotoNotificationText"),
                 type: "success"
             });
         },
         addNotification() {
             notify({
-                title: "Creation successful",
-                text: "The new item was successfully added to the database!",
+                title: this.$t("panelForm.addNotificationTitle"),
+                text: this.$t("panelForm.addNotificationText"),
                 type: "success"
             });
         },
@@ -465,7 +637,7 @@ div>.item-count:last-of-type {
 }
 
 .form-field.number {
-    width: 20%;
+    width: 30%;
 }
 
 .field-label {

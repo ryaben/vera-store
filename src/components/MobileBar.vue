@@ -1,4 +1,6 @@
 <script setup>
+import LanguageSelector from './LanguageSelector.vue';
+
 defineProps({
     title: {
         type: String,
@@ -21,7 +23,7 @@ defineProps({
 </script>
 
 <template>
-    <nav class="navbar flex column">
+    <nav class="navbar flex column wide">
         <div class="bar-elements flex">
             <div :class="{ 'active': activeMore }" @click="toggleMore(); updateHeight()"></div>
             <h1 class="bar-title">{{ title }}</h1>
@@ -35,19 +37,22 @@ defineProps({
         </div>
 
         <Transition name="slide-left">
-            <div class="buttons-container flex column space-between" v-if="activeMore"
+            <div class="buttons-container flex column space-between" v-show="activeMore"
                 :class="{ 'active': activeMore }">
                 <div class="flex column">
                     <div class="buttons-container-title flex y-centered x-centered">
-                        <label>Menu</label>
+                        <label>{{ $t('mobileBar.title') }}</label>
                     </div>
                     <router-link class="link-button flex" v-for="(link, i) in links" :key="i" :to="{ name: link.route }"
                         @click="toggleMore">
                         <p>{{ link.text }}</p>
                     </router-link>
+                    <div class="flex x-centered top-margin">
+                        <LanguageSelector />
+                    </div>
                 </div>
-                <div class="flex">
-                    <p class="software-info">Argentina Deli Shop ver. 1.0<br>made by Ramiro Yaben</p>
+                <div class="flex column y-centered x-centered">
+                    <p class="software-info">{{ $t('mobileBar.softwareInfo') }}<br>{{ $t('mobileBar.author') }}</p>
                 </div>
             </div>
         </Transition>
@@ -57,16 +62,20 @@ defineProps({
 <script>
 export default {
     name: 'MobileBar',
+    emits: ['toggled-bar'],
+    components: {
+        LanguageSelector
+    },
     data() {
         return {
             activeMore: false,
-            theme: '-white',
             height: 0
         }
     },
     methods: {
         toggleMore() {
             this.activeMore = !this.activeMore;
+            this.$emit("toggled-bar", this.activeMore);
         },
         updateHeight() {
             return this.height = this.height === 0 ? 'auto' : 0;
@@ -77,9 +86,13 @@ export default {
 
 <style scoped>
 .navbar {
+    position: fixed;
+    top: 0;
     border-bottom: 3px solid var(--white-soft);
     height: 50px;
     margin-bottom: 15px;
+    background: var(--intense-brown);
+    z-index: 47;
 }
 
 .bar-elements {
@@ -94,7 +107,7 @@ export default {
     cursor: pointer;
     background-image: url("/img/more-white.png");
     background-size: cover;
-    z-index: 4;
+    z-index: 47;
 }
 
 .bar-elements>div.active {
@@ -107,6 +120,7 @@ export default {
     font-size: 18px;
     font-weight: bold;
     margin: 0;
+    color: var(--white-soft);
 }
 
 .cart-container {
@@ -137,8 +151,8 @@ export default {
     width: 18px;
     height: 18px;
     border-radius: 50%;
-    background-color: var(--intense-brown);
-    color: var(--pale-tone);
+    background-color: var(--indigo-dark);
+    color: var(--white-soft);
 }
 
 .cart-count-container label {
@@ -155,7 +169,7 @@ export default {
     width: 50%;
     max-width: 400px;
     height: 100%;
-    z-index: 3;
+    z-index: 46;
 }
 
 .buttons-container-title {
@@ -195,15 +209,15 @@ export default {
 
 @media (prefers-color-scheme: light) {
     .navbar {
-        border-color: var(--indigo-dark);
+        border-color: var(--black-soft);
     }
 
-    .bar-elements>div {
+    /* .bar-elements>div {
         background-image: url("/img/more-black.png");
     }
 
     .cart-container>div {
         background-image: url("/img/cart-black.png");
-    }
+    } */
 }
 </style>

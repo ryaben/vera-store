@@ -47,7 +47,8 @@ defineProps({
             <MapboxMarker v-if="mode === 'picker'" id="mapboxMarker" :color="'#000'" :lng-lat="markerPosition" popup
                 draggable @mb-dragend="updatePosition">
                 <template v-slot:popup>
-                    <p style="color: black; font-size: 12px; text-align: center;">Partner's property location.
+                    <p style="color: black; font-size: 12px; text-align: center;">
+                        {{ $t('mapboxMap.partnerLocation') }}
                     </p>
                 </template>
             </MapboxMarker>
@@ -55,10 +56,16 @@ defineProps({
             <MapboxMarker v-if="mode === 'locationMap'" v-for="(marker, i) in collection" :key="i"
                 :lng-lat="[marker.partnerLocation.longitude, marker.partnerLocation.latitude]" :color="'#000'" popup>
                 <template v-slot:popup>
-                    <p class="marker-name">{{ marker.partnerPropertyName }}</p>
-                    <p class="marker-address">{{ marker.partnerAddress }}</p>
-                    <div v-if="selectedHost !== i" class="action-button flex x-centered" @click="selectHost(i, marker.id)">Select</div>
-                    <label v-if="selectedHost === i" class="selected bold positive-text">✅ Selected</label>
+                    <p class="marker-name centered-text bold">{{ marker.partnerPropertyName }}</p>
+                    <p class="marker-address centered-text">{{ marker.partnerAddress }}</p>
+                    <label v-if="!marker.partnerActivity" class="negative-text small-text">
+                        {{ $t('mapboxMap.currentlyUnavailable') }}
+                    </label>
+                    <div v-if="selectedHost !== i" class="action-button flex x-centered y-centered"
+                        :class="{ 'disabled': !marker.partnerActivity }" @click="selectHost(i, marker.id)">
+                        {{ $t('mapboxMap.select') }}
+                    </div>
+                    <label v-if="selectedHost === i" class="selected bold positive-text">{{ $t('mapboxMap.selected') }}</label>
                 </template>
             </MapboxMarker>
 
@@ -106,12 +113,19 @@ export default {
     display: none;
 }
 
-.marker-name {}
+.marker-name {
+    color: var(--black);
+    margin-bottom: 3px;
+}
 
 .marker-address {
     color: var(--black);
     font-size: 12px;
-    text-align: center;
+}
+
+.action-button {
+    width: min-content;
+    padding: 0 8px;
 }
 
 label.selected {

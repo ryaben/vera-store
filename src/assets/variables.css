@@ -9,6 +9,7 @@
   --soft-beige: #e3ded7;
 
   --pale-grey: #dcd8d8;
+  --soft-grey: #a09f9f;
   --dark-grey: #474646;
 
   --black: #181818;
@@ -29,23 +30,4 @@
   --failure-tone: red;
   --light-success-tone: #78c38d;
   --success-tone: #356643;
-  --assignation: rgb(12, 77, 162);
-  --star-color: #FC0;
-
-  --gold: rgb(237, 207, 39);
-  --gold-dark: rgb(162, 143, 32);
-  --silver: rgb(160, 160, 160);
-  --silver-dark: rgb(121, 119, 119);
-  --bronze: rgb(162, 81, 44);
-  --bronze-dark: rgb(117, 56, 28);
-
-  --divider-light-1: rgba(60, 60, 60, 0.29);
-  --divider-light-2: rgba(60, 60, 60, 0.12);
-  --divider-dark-1: rgba(84, 84, 84, 0.65);
-  --divider-dark-2: rgba(84, 84, 84, 0.48);
-
-  --text-light-1: var(--indigo);
-  --text-light-2: rgba(60, 60, 60, 0.66);
-  --text-dark-1: var(--white);
-  --text-dark-2: rgba(235, 235, 235, 0.64);
 }
