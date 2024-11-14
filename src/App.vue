@@ -73,6 +73,11 @@ export default {
     await store.dispatch('getItems');
     await store.dispatch('getPartners');
     await store.dispatch('getCoupons');
+  },
+  beforeMount() {
+    if (!localStorage.getItem('lang')) {
+      localStorage.setItem('lang', JSON.stringify({ title: 'Welcome to our store!', image: '/img/english.png', value: 'en' }));
+    }
   }
 }
 </script>

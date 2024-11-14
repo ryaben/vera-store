@@ -24,7 +24,7 @@ defineProps({
 
 <template>
     <section class="page-section">
-        <div class="store-container flex wide" :class="{ 'relocated': scrollYPosition > 80 }">
+        <div class="store-container flex wide" :class="{ 'relocated': scrollYPosition > 80 }" ref="storeContainer">
             <div class="store-tools flex column" :class="{ 'floating': scrollYPosition > 80 }">
                 <TabSelector v-show="windowWidth <= 850" default-tab="search" @tab-selected="selectTab" :tab-list="[
                     { identifier: 'search', tabTitle: $t('store.searchTabTitle') },
@@ -170,6 +170,9 @@ export default {
             let pages = Math.ceil(this.visibleElements.length / this.itemsPerPage);
             return pages === 0 ? 1 : pages;
         },
+        floatingStoreToolsWidth() {
+            return (0.27 * this.$refs.storeContainer.offsetWidth) + "px";
+        }
     },
     methods: {
         toggleAvailability(value) {
@@ -338,6 +341,7 @@ export default {
     position: relative;
     flex-direction: column;
 }
+
 .store-container.relocated {
     justify-content: right;
 }
@@ -353,13 +357,6 @@ export default {
     border-radius: 6px;
     padding: 10px;
     margin-bottom: 25px;
-}
-
-.store-tools.floating {
-    position: fixed;
-    width: 27%;
-    top: 2vw;
-    left: 2vw;
 }
 
 div.section-selector-container {
@@ -490,6 +487,12 @@ div.section-selector-container {
         border: none;
         border-radius: 6px;
     }
+    .store-tools.floating {
+        position: fixed;
+        width: v-bind(floatingStoreToolsWidth);
+        top: 2.5vw;
+        left: 2.5vw;
+    }
 
     .products-amount {
         margin-top: 5px;
@@ -514,8 +517,7 @@ div.section-selector-container {
     }
 
     #resultsContainer {
-        padding-left: 40px;
-        width: 70%;
+        width: 65%;
         margin-top: -4px;
     }
 

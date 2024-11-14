@@ -47,7 +47,7 @@ export default {
                 { title: 'Welcome to our store!', image: '/img/english.png', value: 'en' },
                 { title: '¡Bienvenidos/as a nuestra tienda!', image: '/img/spanish.png', value: 'es' }
             ],
-            displayLanguage: { title: 'Welcome to our store!', image: '/img/en.png', value: 'en' }
+            displayLanguage: undefined
         }
     },
     methods: {
@@ -55,25 +55,15 @@ export default {
             this.$i18n.locale = value;
         },
         saveLanguageOption() {
-            return localStorage.setItem('lang', this.displayLanguage.value);
+            return localStorage.setItem('lang', JSON.stringify(this.displayLanguage));
         },
         loadLanguageOption() {
             return localStorage.getItem('lang');
         }
     },
     mounted() {
-        let savedLanguage;
-        try {
-            savedLanguage = this.loadLanguageOption();
-        } catch {
-            savedLanguage = 'en';
-        }
-
-        this.displayLanguage = this.languageOptions.find(lang => {
-            return lang.value === savedLanguage;
-        });
-
-        this.updatei18n(savedLanguage);
+        this.displayLanguage = JSON.parse(this.loadLanguageOption());
+        this.updatei18n(this.displayLanguage.value);
     }
 }
 </script>

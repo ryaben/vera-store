@@ -49,6 +49,9 @@ const windowWidth = width;
                     at enim. Phasellus lacus odio, ullamcorper ac ipsum in, tincidunt tincidunt massa. Suspendisse ut
                     malesuada sapien, vitae mollis diam.
                 </p>
+                <router-link class="action-button large flex x-centered y-centered" :to="{ name: 'Store' }">
+                    {{ $t("home.store") }}
+                </router-link>
             </div>
         </div>
     </section>
@@ -63,8 +66,8 @@ export default {
     data() {
         return {
             galleryImages: shallowReactive([
-                new Img('https://autogestion.omint.com.ar/static/media/logo_omint.af261840.svg', 'Omint'),
-                new Img('/img/home-gallery/payoneer.png', 'Payoneer')
+                new Img('/img/photo1.png', 'Photo 1'),
+                new Img('/img/photo2.png', 'Photo 2')
             ]),
             galleryOptions: {
                 autoplay: true,
@@ -87,6 +90,7 @@ export default {
 }
 
 .home-text {
+    width: 95%;
     margin: 10px auto auto auto;
 }
 
@@ -94,8 +98,12 @@ div.multiselect.language-selector {
     width: 100%;
 }
 
-@media (prefers-color-scheme: light) {
-    
+@media (prefers-color-scheme: light) {}
+
+@media only screen and (max-width: 750px) {
+    .home-text {
+        width: 95%;
+    }
 }
 
 @media only screen and (min-width: 750px) {
