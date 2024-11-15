@@ -7,6 +7,7 @@ import { createI18n } from "vue-i18n";
 import messages from "@intlify/unplugin-vue-i18n/messages";
 import VueAwesomePaginate from "vue-awesome-paginate";
 import "vue-awesome-paginate/dist/style.css";
+import $ from 'jquery';
 
 const i18n = createI18n({
     legacy: false,
@@ -17,4 +18,4 @@ const i18n = createI18n({
     messages: messages,
 });
 
-createApp(App).use(router).use(Notifications).use(i18n).use(VueAwesomePaginate).mount('#app');
+createApp(App).use(router).use(Notifications).use(i18n).use(VueAwesomePaginate).use($).mount('#app');

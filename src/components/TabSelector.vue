@@ -69,7 +69,7 @@ export default {
 }
 
 .section-button label.selected {
-    background-color: var(--soft-brown);
+    background-color: var(--intense-main-palette);
     color: var(--white-soft);
 }
 

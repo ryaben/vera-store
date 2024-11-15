@@ -5,29 +5,31 @@ import DropdownBox from '../components/DropdownBox.vue';
 <template>
     <section class="page-section">
         <h2 class="page-title bottom-margin">{{ $t("faqs.title") }}</h2>
-        <DropdownBox v-for="(question, i) in FAQs" :key="i" :box-title="question.title"
+        <DropdownBox v-for="(question, i) in [
+                { title: $t('faqs.questionTitle1'), content: $t('faqs.questionContent1') },
+                { title: $t('faqs.questionTitle2'), content: $t('faqs.questionContent2') }
+            ]" :key="i" :box-title="question.title"
             :box-content="question.content" />
 
-        <!-- <DropdownBox :box-title="$t('faqs.questionTitle1')" :box-content="$t('faqs.questionContent1')" />
-        <DropdownBox :box-title="$t('faqs.questionTitle2')" :box-content="$t('faqs.questionContent2')" /> -->
         <p class="top-margin centered-text">
-            {{ $t("faqs.missingQuestion") }}<br><router-link>{{ $t("faqs.reachOut") }}</router-link>
+            {{ $t("faqs.missingQuestion") }}
+            <br>
+            <a href="https://api.whatsapp.com/send?phone=5491132703200" target="_blank">
+                {{ $t("faqs.reachOut") }}
+            </a>
         </p>
     </section>
 </template>
 
 <script>
 export default {
-    name: 'Home',
+    name: 'FAQs',
     components: {
         DropdownBox
     },
     data() {
         return {
-            FAQs: [
-                { title: this.$t('faqs.questionTitle1'), content: this.$t('faqs.questionContent1') },
-                { title: this.$t('faqs.questionTitle2'), content: this.$t('faqs.questionContent2') }
-            ]
+           
         }
     }
 }

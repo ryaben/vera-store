@@ -24,8 +24,8 @@ defineProps({
 
 <template>
     <section class="page-section">
-        <div class="store-container flex wide" :class="{ 'relocated': scrollYPosition > 80 }" ref="storeContainer">
-            <div class="store-tools flex column" :class="{ 'floating': scrollYPosition > 80 }">
+        <div class="store-container flex wide">
+            <div class="store-tools flex column">
                 <TabSelector v-show="windowWidth <= 850" default-tab="search" @tab-selected="selectTab" :tab-list="[
                     { identifier: 'search', tabTitle: $t('store.searchTabTitle') },
                     { identifier: 'categories', tabTitle: $t('store.categoriesTabTitle') },
@@ -61,7 +61,7 @@ defineProps({
                 <div v-show="windowWidth > 850 || selectedTab === 'availability'" class="flex tab-wrapper"
                     :class="{ 'x-centered': windowWidth < 850 }">
                     <VueToggle id="availabilityToggle" :title="$t('store.availabilityToggle')" name="itemAvailability"
-                        font-size="16px" active-color="var(--intense-brown)" :toggled="availabilityToggle"
+                        font-size="16px" active-color="var(--reddish-main-palette)" :toggled="availabilityToggle"
                         @toggle="toggleAvailability" />
                 </div>
             </div>
@@ -82,7 +82,6 @@ defineProps({
                                 { label: $t('store.sortingOption1'), value: 'none' },
                                 { label: $t('store.sortingOption2'), value: 'ascendingOrder' },
                                 { label: $t('store.sortingOption3'), value: 'descendingOrder' },
-                                { label: $t('store.sortingOption4'), value: 'mostPopular' },
                                 { label: $t('store.sortingOption5'), value: 'lowestPrice' },
                                 { label: $t('store.sortingOption6'), value: 'highestPrice' },
                                 { label: $t('store.sortingOption7'), value: 'random' }
@@ -132,7 +131,8 @@ export default {
             itemsPerPage: 15,
             currentPage: 1,
             selectedSort: { label: this.$t('store.sortingOption1'), value: "none" },
-            scrollYPosition: 0
+            scrollYPosition: 0,
+            maxScrollY: undefined
         }
     },
     watch: {
@@ -169,9 +169,6 @@ export default {
         totalPages() {
             let pages = Math.ceil(this.visibleElements.length / this.itemsPerPage);
             return pages === 0 ? 1 : pages;
-        },
-        floatingStoreToolsWidth() {
-            return (0.27 * this.$refs.storeContainer.offsetWidth) + "px";
         }
     },
     methods: {
@@ -314,19 +311,8 @@ export default {
         },
         normalizeString(string) {
             return string.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-        },
-    },
-    mounted() {
-        if (this.itemsList.length) this.pageElements();
-
-        const that = this;
-        window.addEventListener("scroll", (event) => {
-            that.scrollYPosition = window.scrollY;
-        });
-    },
-    beforeDestroy() {
-        window.removeEventListener("scroll", this.onScroll);
-    },
+        }
+    }
 }
 </script>
 
@@ -340,9 +326,6 @@ export default {
 .store-container {
     position: relative;
     flex-direction: column;
-}
-
-.store-container.relocated {
     justify-content: right;
 }
 
@@ -352,8 +335,8 @@ export default {
 
 .store-tools {
     height: min-content;
-    border: 2px solid var(--intense-brown);
-    background-color: var(--light-brown);
+    border: 2px solid var(--black-soft);
+    background-color: var(--light-main-palette);
     border-radius: 6px;
     padding: 10px;
     margin-bottom: 25px;
@@ -382,7 +365,7 @@ div.section-selector-container {
     background-color: var(--white-soft);
     color: var(--black-mute);
     border-radius: 8px;
-    border: 2px solid var(--light-brown);
+    border: 2px solid var(--light-main-palette);
 }
 
 .item-price::before {
@@ -402,7 +385,7 @@ div.section-selector-container {
     max-width: 500px;
     height: 40px;
     margin: 2px auto 5px auto;
-    border: 2px solid var(--soft-brown);
+    border: 2px solid var(--soft-main-palette);
     border-radius: 8px;
     padding-right: 4px;
     background: url("/img/search.png") no-repeat right;
@@ -482,16 +465,14 @@ div.section-selector-container {
     }
 
     .store-tools {
-        width: 27%;
-        padding: 2%;
+        position: sticky;
+        width: 25dvw;
+        padding: 2dvw;
         border: none;
         border-radius: 6px;
-    }
-    .store-tools.floating {
-        position: fixed;
-        width: v-bind(floatingStoreToolsWidth);
-        top: 2.5vw;
-        left: 2.5vw;
+        top: 2.5dvw;
+        left: 2.5dvw;
+        margin-right: auto;
     }
 
     .products-amount {

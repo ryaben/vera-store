@@ -28,7 +28,7 @@ defineProps({
 
 <template>
     <section class="page-section">
-        <h1 class="form-title">{{ $t("cart.title") }}</h1>
+        <h2 class="form-title">{{ $t("cart.title") }}</h2>
         <div class="cart-container flex wide"
             :class="{ 'column': windowWidth < 1050 || !cartList.length, 'bordered': cartList.length }">
             <div class="cart-subcontainer flex column wide"
@@ -297,12 +297,12 @@ div.right-border {
 
 .total-price {
     font-weight: bold;
-    color: var(--soft-brown);
+    color: var(--black-soft);
 }
 
 .total-price.discounted {
     opacity: 0.7;
-    color: var(--triggerable);
+    color: var(--negative-main-palette);
 }
 
 .buttons-container {

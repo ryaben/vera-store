@@ -19,11 +19,11 @@ defineProps({
 <template>
     <section class="page-section">
         <h2 class="item-title centered-text" :class="{ 'large-bottom-margin': windowWidth >= 1050 }">{{ itemData.itemTitle }}</h2>
-        <div class="flex x-centered" :class="{ 'column': windowWidth < 1050 }">
-            <div class="photo-flex flex column y-centered" :class="{ 'flex-sized': windowWidth >= 1050 }">
+        <div class="flex x-centered bottom-margin" :class="{ 'column': windowWidth < 1050 }">
+            <div class="photo-flex flex x-centered" :class="{ 'flex-sized': windowWidth >= 1050 }">
                 <img class="item-photo" :src="itemData.itemPhoto" alt="Photo">
             </div>
-            <div class="description-flex flex column x-centered y-centered" :class="{ 'flex-sized': windowWidth >= 1050 }">
+            <div class="description-flex flex column y-centered" :class="{ 'flex-sized': windowWidth >= 1050 }">
                 <p class="item-description">{{ itemData.itemLongDescription }}</p>
             </div>
         </div>
@@ -66,7 +66,7 @@ export default {
     max-height: 300px;
     margin-bottom: 20px;
     border-radius: 10px;
-    border: 2px solid var(--soft-brown);
+    border: 2px solid var(--soft-main-palette);
 }
 
 .photo-flex.flex-sized {
@@ -78,12 +78,18 @@ export default {
 }
 
 .description-flex.flex-sized {
+    justify-content: flex-start;
     width: 60%;
+    border: 2px solid var(--soft-main-palette);
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+    max-height: 300px;
+    overflow-y: scroll;
 }
 
 .item-description {
     width: 90%;
-    margin-bottom: 20px;
+    margin-top: 5%;
 }
 
 .action-button {

@@ -37,9 +37,9 @@ export default {
   justify-content: center;
   text-decoration: none;
   height: fit-content;
-  color: var(--pale-tone);
-  background-color: var(--intense-brown);
-  border: 2px solid var(--pale-tone);
+  color: var(--white-soft);
+  background-color: var(--intense-main-palette);
+  border: 2px solid var(--white-soft);
   z-index: 100;
 }
 
@@ -48,7 +48,7 @@ export default {
 }
 
 .subbutton-router-link.router-link-active, .subbutton-router-link:hover {
-  background-color: var(--light-brown);
+  background-color: var(--reddish-main-palette);
   color: var(--black-soft);
 }
 

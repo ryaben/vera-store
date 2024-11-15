@@ -36,7 +36,10 @@ defineProps({
                 <p class="item-list" v-for="(item, i) in differentItemsInCart" :key="i">
                     • {{ item.amount }} x {{ itemsList.find((el) => { return el.id === item.id }).itemTitle }}
                 </p>
-                <p class="items-total bold">${{ orderData.orderPrice.toFixed(2) }}</p>
+                <p class="items-total bold">
+                    <span class="uppercased">{{ orderData.orderCurrency }}</span>
+                    {{ orderData.orderPrice.toFixed(2) }}
+                </p>
             </div>
             <div class="status-grid wide">
                 <div class="status-point done"></div>
@@ -169,7 +172,7 @@ export default {
 .status-point {
     height: 16px;
     border-radius: 50%;
-    background-color: var(--light-brown);
+    background-color: var(--light-main-palette);
     margin-bottom: 5px;
 }
 
@@ -190,7 +193,7 @@ export default {
 
 .status-line {
     height: 2px;
-    background-color: var(--soft-brown);
+    background-color: var(--soft-main-palette);
     border: none;
     margin: 7px 0 0 0;
 }
@@ -232,6 +235,7 @@ export default {
 
     .status-note {
         font-size: 16px;
+        width: 50%;
     }
 }
 </style>

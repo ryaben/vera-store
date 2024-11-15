@@ -7,6 +7,11 @@ defineProps({
         required: true,
         default: []
     },
+    parameterOptions: {
+        type: Array,
+        required: false,
+        default: ["id"]
+    },
 })
 </script>
 
@@ -14,7 +19,7 @@ defineProps({
     <div class="panel-container flex">
         <div class="flex wide bottom-margin">
             <label>{{ $t('panel.displayBy') }}&nbsp;</label>
-            <select v-model="displayParameter">
+            <select v-model="displayParameter" class="parameters-select">
                 <option v-for="(parameter, i) in parameterOptions" :key="i" :value="parameter">{{ parameter }}</option>
             </select>
         </div>
@@ -34,13 +39,7 @@ export default {
     data() {
         return {
             selectedIndex: undefined,
-            parameterOptions: [],
             displayParameter: ""
-        }
-    },
-    watch: {
-        cardSource(newValue) {
-            if (newValue.length) this.createParameterOptions(newValue[0]);
         }
     },
     methods: {
@@ -50,10 +49,9 @@ export default {
         updateSelectedCard(index) {
             this.selectedIndex = index;
         },
-        createParameterOptions(card) {
-            this.parameterOptions = Object.keys(card);
-            this.displayParameter = this.parameterOptions[0];
-        }
+    },
+    mounted() {
+        this.displayParameter = this.parameterOptions[0];
     }
 }
 </script>
@@ -66,13 +64,17 @@ export default {
     overflow-y: scroll;
 }
 
+.parameters-select {
+    width: max-content;
+}
+
 .panel-card {
     margin: 0 4px 4px 0;
 }
 
 .panel-card.selected {
-    background-color: var(--intense-brown);
-    color: var(--dimmed-brown);
+    background-color: var(--soft-main-palette);
+    color: var(--black-soft);
     transition: background-color 0.25s;
 }
 

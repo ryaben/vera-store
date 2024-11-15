@@ -25,11 +25,15 @@ defineProps({
 
 <template>
     <nav class="navbar flex column">
-        <div class="bar-elements flex">
+        <div class="bar-elements flex x-centered bottom-margin top-margin">
             <img class="logo-image" :src="logo" alt="Logo">
+            <div class="flex column y-centered bottom-margin" style="justify-content: flex-end;">
+                <h1 class="store-title bold">Argentina Deli Shop</h1>
+                <p class="slogan-text centered-text">Bring back home a taste of Argentina!</p>
+            </div>
         </div>
         <div class="links-container flex x-centered">
-            <LanguageSelector />
+            <!-- <LanguageSelector /> -->
             <div class="flex">
                 <NavbarButton v-for="(item, i) in buttons" :key="i" :text="item.text" :icon="item.icon"
                     :route="item.route" :sub-buttons="item.subButtons" />
@@ -67,10 +71,23 @@ export default {
 .navbar {
     width: 95%;
     margin: auto;
+    margin-top: 20px;
+    background: var(--intense-main-palette);
+    border-radius: 8px;
 }
 
 .logo-image {
-    margin: auto;
+    width: 120px;
+}
+
+.store-title {
+    font-size: 28px;
+    margin: 0;
+}
+
+.slogan-text {
+    font-size: 16px;
+    margin: 0;
 }
 
 div.multiselect.language-selector {
@@ -81,9 +98,10 @@ div.multiselect.language-selector {
 
 .links-container {
     position: relative;
-    background: var(--intense-brown);
-    border-radius: 12px;
+    background: var(--intense-main-palette);
     padding: 8px;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
     /* border: 2px solid var(--pale-tone); */
 }
 
@@ -101,7 +119,7 @@ div.multiselect.language-selector {
 }
 
 .link-button.router-link-active {
-    background: var(--light-brown);
+    background: var(--light-main-palette);
     color: var(--black-soft);
     border-radius: 4px;
 }
@@ -128,7 +146,7 @@ div.multiselect.language-selector {
 }
 
 .cart-container.router-link-active {
-    background-color: var(--light-brown);
+    background-color: var(--reddish-main-palette);
 }
 
 .cart-count-container {

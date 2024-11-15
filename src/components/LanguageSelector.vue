@@ -11,13 +11,18 @@ defineProps({
         type: Boolean,
         required: false,
         default: false
+    },
+    openDirection: {
+        type: Boolean,
+        required: false,
+        default: "below"
     }
 });
 </script>
 
 <template>
     <Multiselect v-model="displayLanguage" :options="languageOptions" :select-label="''" :deselect-label="''"
-        open-direction="below" :show-labels="false" :allow-empty="false" :searchable="false"
+        :open-direction="openDirection" :show-labels="false" :allow-empty="false" :searchable="false"
         @select="updatei18n(displayLanguage.value); saveLanguageOption()" class="language-selector"
         :class="{ 'transparent': transparent }">
         <template #singleLabel="props">

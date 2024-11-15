@@ -611,7 +611,7 @@ export default {
 }
 
 .action-button.selected {
-    outline: 2px solid var(--soft-brown);
+    outline: 2px solid var(--soft-main-palette);
 }
 
 .id-title {
@@ -660,7 +660,7 @@ div>.item-count:last-of-type {
 .item-photo {
     width: 60%;
     max-height: 200px;
-    border: 1px solid var(--soft-brown);
+    border: 1px solid var(--soft-main-palette);
     border-radius: 6px;
     margin-bottom: 8px;
 }

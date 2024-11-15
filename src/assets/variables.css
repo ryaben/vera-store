@@ -5,28 +5,30 @@
   --white: #ffffff;
   --white-soft: #f8f8f8;
   --white-mute: #f2f2f2;
+
   --pale-tone: #dbd2bb;
+  --pale-grey: #dcd8d8;
   --soft-beige: #e3ded7;
 
-  --pale-grey: #dcd8d8;
   --soft-grey: #a09f9f;
   --dark-grey: #474646;
-
   --black: #181818;
   --black-soft: #222222;
   --black-mute: #282828;
   --indigo: #2c3e50;
   --indigo-dark: #1f2f3f;
 
-  --intense-brown: #4c2d04;
-  --soft-brown: #9b784b;
-  --light-brown: #b88c75;
-  --dimmed-brown: #d5b18f;
-  --red-brown: #ca5824dd;
+  --intense-main-palette: #4ca299;
+  --soft-main-palette: #9b784b;
+  --light-main-palette: #b88c75;
+  --dimmed-main-palette: #d5b18f;
+  --reddish-main-palette: #ca5924;
+  --negative-main-palette: #a1c6cc;
+  --impact-main-palette: #ffd813;
 
   --payoneer-orange: #FF4600;
+  --whatsapp-green: #25D366;
 
-  --triggerable: indianred;
   --failure-tone: red;
   --light-success-tone: #78c38d;
   --success-tone: #356643;

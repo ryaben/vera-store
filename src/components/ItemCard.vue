@@ -42,7 +42,7 @@ defineProps({
                         {{ $t('itemCard.saleTag') }}
                     </span>
                 </label>
-                <label class="unavailability-text negative-text" v-if="!itemInfo.itemAvailability">{{
+                <label class="unavailability-text bold negative-text" v-if="!itemInfo.itemAvailability">{{
                     $t('itemCard.unavailable') }}</label>
             </div>
             <div class="flex y-centered space-between top-margin">
@@ -130,14 +130,14 @@ export default {
 
 .see-more-text {
     font-weight: bold;
-    color: var(--soft-brown);
+    color: var(--soft-main-palette);
     text-decoration: underline;
 }
 
 .item-price {
     font-size: 18px;
     font-weight: bold;
-    color: var(--pale-tone);
+    color: var(--intense-main-palette);
 }
 
 .sale-tag {
@@ -147,8 +147,8 @@ export default {
     height: 25px;
     padding: 0 5px 0 5px;
     border-radius: 3px;
-    background: var(--red-brown);
-    color: var(--white-soft);
+    background: var(--impact-main-palette);
+    color: var(--black-soft);
 }
 
 .unavailability-text {
@@ -183,7 +183,7 @@ export default {
     font-weight: bold;
     font-size: 21px;
     border: 1px solid var(--black-mute);
-    background-color: var(--soft-brown);
+    background-color: var(--soft-main-palette);
     color: var(--pale-tone);
     padding: 1px 6px 1px 6px;
     padding-inline: 1px;
@@ -213,10 +213,6 @@ export default {
     .item-card {
         border-color: var(--indigo);
         background-color: var(--pale-grey);
-    }
-
-    .item-price {
-        color: var(--intense-brown);
     }
 }
 </style>

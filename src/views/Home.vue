@@ -49,7 +49,7 @@ const windowWidth = width;
                     at enim. Phasellus lacus odio, ullamcorper ac ipsum in, tincidunt tincidunt massa. Suspendisse ut
                     malesuada sapien, vitae mollis diam.
                 </p>
-                <router-link class="action-button large flex x-centered y-centered" :to="{ name: 'Store' }">
+                <router-link class="action-button large flex x-centered y-centered top-margin bottom-margin" :to="{ name: 'Store' }">
                     {{ $t("home.store") }}
                 </router-link>
             </div>

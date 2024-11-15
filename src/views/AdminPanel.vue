@@ -33,21 +33,21 @@ defineProps({
         ]" />
 
         <div class="tab-container flex wide" v-show="selectedTab === 'orders'">
-            <Panel class="admin-panel" :card-source="ordersList" @clicked-card="populateOrderForm" />
+            <Panel class="admin-panel" :card-source="ordersList" @clicked-card="populateOrderForm" :parameter-options="generateParameters(orderForm)" />
             <PanelForm class="panel-form" :form-type="'order'" :form-info="orderForm" :items-list="itemsList" />
         </div>
         <div class="tab-container flex wide" v-show="selectedTab === 'items'">
-            <Panel class="admin-panel" :card-source="itemsList" @clicked-card="populateItemForm" />
+            <Panel class="admin-panel" :card-source="itemsList" @clicked-card="populateItemForm" :parameter-options="generateParameters(itemForm)" />
             <PanelForm class="panel-form" :form-type="'item'" :form-info="itemForm" :items-list="itemsList" />
         </div>
         <div class="tab-container flex wide" v-show="selectedTab === 'partners'">
-            <Panel class="admin-panel" :card-source="partnersList" @clicked-card="populatePartnerForm" />
+            <Panel class="admin-panel" :card-source="partnersList" @clicked-card="populatePartnerForm" :parameter-options="generateParameters(partnerForm)" />
             <PanelForm class="panel-form" :form-type="'partner'" :form-info="partnerForm" :items-list="itemsList"
                 :marker-position="[partnerForm.partnerLocation._long, partnerForm.partnerLocation._lat]"
                 @dragged-marker="updatePartnerLocation" />
         </div>
         <div class="tab-container flex wide" v-show="selectedTab === 'coupons'">
-            <Panel class="admin-panel" :card-source="couponsList" @clicked-card="populateCouponForm" />
+            <Panel class="admin-panel" :card-source="couponsList" @clicked-card="populateCouponForm" :parameter-options="generateParameters(couponForm)" />
             <PanelForm class="panel-form" :form-type="'coupon'" :form-info="couponForm" :items-list="itemsList" />
         </div>
     </section>
@@ -137,6 +137,11 @@ export default {
         },
         selectTab(index) {
             this.selectedTab = index;
+        },
+        generateParameters(objectForm) {
+            let formParameters = Object.keys(objectForm);
+            formParameters.unshift("id");
+            return formParameters;
         }
     },
     async beforeCreate() {
@@ -146,9 +151,17 @@ export default {
 </script>
 
 <style scoped>
+.admin-tabs {
+    background: var(--soft-beige);
+}
+
 .admin-tabs:deep(.section-button label) {
     border-top-left-radius: 0px;
     border-top-right-radius: 0px;
+}
+
+.tab-container {
+    background: var(--soft-beige);
 }
 
 .admin-panel {

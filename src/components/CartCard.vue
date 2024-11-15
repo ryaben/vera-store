@@ -88,7 +88,7 @@ export default {
 
 <style scoped>
 .item-card-wrapper {
-    background: var(--dimmed-brown);
+    background: var(--dimmed-main-palette);
     border-radius: 8px;
     margin-bottom: 4px;
     width: 92%;
@@ -138,11 +138,11 @@ export default {
 .item-price {
     font-size: 18px;
     font-weight: bold;
-    color: var(--soft-brown);
+    color: var(--black-soft);
 }
 
 .item-price.total {
-    color: var(--intense-brown);
+    color: var(--black-soft);
 }
 
 @media (prefers-color-scheme: light) {

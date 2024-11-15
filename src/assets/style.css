@@ -44,7 +44,7 @@ body {
 
 a {
   text-decoration: none;
-  color: var(--light-brown);
+  color: var(--light-main-palette);
   font-weight: bold;
 }
 
@@ -71,11 +71,6 @@ div.disabled {
 
 label {
   font-size: 16px;
-}
-
-footer {
-  background: var(--intense-brown);
-  
 }
 
 .flex {
@@ -134,6 +129,10 @@ footer {
   text-decoration: line-through;
 }
 
+.uppercased {
+  text-transform: uppercase;
+}
+
 .hidden {
   display: none;
 }
@@ -170,7 +169,8 @@ footer {
   display: flex;
   align-items: center;
   flex-direction: column;
-  margin: 2.5%;
+  min-height: 350px;
+  margin: 2.5dvw 2.5dvw 4dvw 2.5dvw;
 }
 
 .page-section.bordered {
@@ -190,8 +190,8 @@ footer {
   border-radius: 12px;
   border-style: solid;
   border-color: var(--black);
-  background-color: var(--intense-brown);
-  color: var(--soft-beige);
+  background-color: var(--reddish-main-palette);
+  color: var(--black-soft);
   padding-block: 0;
   padding-inline: 0;
   cursor: pointer;
@@ -205,11 +205,11 @@ footer {
 }
 
 .action-button.red {
-  background-color: var(--triggerable);
+  background-color: var(--negative-main-palette);
 }
 
 .action-button a {
-  color: var(--soft-beige);
+  color: var(--black-soft);
 }
 
 .small-text {
@@ -217,7 +217,7 @@ footer {
 }
 
 .negative-text {
-  color: var(--triggerable);
+  color: var(--negative-main-palette);
 }
 
 .positive-text {
@@ -235,7 +235,7 @@ img.loading-image {
 /* Multiselect */
 
 div.multiselect {
-  border: 1px solid var(--soft-brown);
+  border: 1px solid var(--soft-main-palette);
   border-radius: 5px;
   max-width: 500px;
 }
@@ -246,7 +246,7 @@ input.multiselect__single {
 }
 
 span.multiselect__tag {
-  background: var(--soft-brown);
+  background: var(--soft-main-palette);
 }
 
 i.multiselect__tag-icon::after {
@@ -256,7 +256,8 @@ i.multiselect__tag-icon::after {
 
 span.multiselect__option--highlight,
 span.multiselect__option--highlight::after {
-  background: var(--intense-brown);
+  background: var(--soft-beige);
+  color: var(--black-soft);
 }
 
 span.multiselect__option--highlight.multiselect__option--selected,
@@ -265,7 +266,7 @@ span.multiselect__option--highlight.multiselect__option--selected::after {
 }
 
 div.multiselect__select::before {
-  border-color: var(--soft-brown) transparent transparent;
+  border-color: var(--soft-main-palette) transparent transparent;
 }
 
 /* Pagination component */
@@ -286,7 +287,8 @@ div.multiselect__select::before {
   padding-inline: 0;
   margin: auto 2px auto 2px;
   border-radius: 5px;
-  border: 1px solid var(--intense-brown);
+  /* border: 1px solid var(--intense-main-palette); */
+  border: none;
   color: var(--black-soft);
   transition: all 0.2s;
 }
@@ -308,14 +310,14 @@ div.multiselect__select::before {
 }
 
 .pagination-container .active-page {
-  background-color: var(--soft-brown);
+  background-color: var(--soft-main-palette);
 }
 
 .pagination-container .first-page-button,
 .pagination-container .last-page-button,
 .pagination-container .next-button,
 .pagination-container .back-button {
-  background-color: var(--dimmed-brown);
+  background-color: var(--dimmed-main-palette);
 }
 
 /* Mapbox */

@@ -98,13 +98,13 @@ export default {
   height: 33px;
   padding: 10px;
   border-radius: 8px;
-  color: var(--pale-tone);
+  color: var(--white-soft);
   cursor: pointer;
-  border: 2px solid var(--pale-tone);
+  border: 2px solid var(--white-soft);
 }
 
 .button-container.selected {
-  background-color: var(--light-brown);
+  background-color: var(--light-main-palette);
 }
 
 .button-container.unfolded {
@@ -115,7 +115,7 @@ export default {
 .tab-router-link:has(.sub-buttons-container .router-link-active) .button-container,
 .tab-router-link.router-link-active .button-container,
 .tab-router-link .button-container:hover {
-  background-color: var(--light-brown);
+  background-color: var(--reddish-main-palette);
   color: var(--black-soft);
 }
 

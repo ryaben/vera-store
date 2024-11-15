@@ -2,6 +2,8 @@
 import store from './store';
 import MobileBar from './components/MobileBar.vue';
 import NavBar from './components/NavBar.vue';
+import DesktopFooter from './components/DesktopFooter.vue';
+import RoundLink from './components/RoundLink.vue';
 import { useWindowSize } from 'vue-window-size';
 const { width } = useWindowSize();
 const windowWidth = width;
@@ -32,21 +34,21 @@ const windowWidth = width;
     </router-view>
   </main>
 
-  <footer class="flex" v-if="windowWidth > 750">
+  <DesktopFooter v-if="windowWidth > 750" />
 
-  </footer>
-
+  <RoundLink v-if="windowWidth <= 750" id="whatsappLink" :icon="'whatsapp'"
+    :href="'https://api.whatsapp.com/send?phone=5491132703200'" :width="42" :height="42" />
   <notifications position="top center" width="350px" :speed="700" :pause-on-hover="true" />
 </template>
 
 <script>
 export default {
   components: {
-    MobileBar, NavBar
+    MobileBar, NavBar, RoundLink
   },
   data() {
     return {
-      
+
     }
   },
   computed: {
@@ -82,4 +84,10 @@ export default {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+#whatsappLink {
+  position: fixed;
+  right: 4dvw;
+  bottom: 4dvw;
+}
+</style>

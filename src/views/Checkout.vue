@@ -37,7 +37,7 @@ defineProps({
 
 <template>
     <section class="page-section">
-        <h1 class="form-title">{{ $t("checkout.title") }}</h1>
+        <h2 class="form-title">{{ $t("checkout.title") }}</h2>
         <div class="flex column y-centered" v-if="processingOrder">
             <img class="loading-image" src="/img/loading.gif" alt="Loading">
             <p>{{ $t("checkout.processing") }}</p>
@@ -153,7 +153,7 @@ export default {
             this.orderCurrency = 'usd';
         },
         async issueOrder() {
-            const that = this;
+            const orderAmount = this.orderCurrency === "usd" ? this.checkoutAmount : (this.checkoutAmount * this.blueDollarRate);
 
             if (!this.selectedHost) {
                 return this.missingHostNotification();
@@ -172,7 +172,7 @@ export default {
                 orderIssueDate: Timestamp.fromDate(new Date()),
                 orderLocation: this.selectedHost,
                 orderStatus: 0,
-                orderPrice: this.checkoutAmount,
+                orderPrice: orderAmount,
                 orderItems: this.cartList.map((item) => { return item.id })
             });
 
@@ -268,7 +268,7 @@ div.right-border {
 .total-price {
     font-size: 18px;
     font-weight: bold;
-    color: var(--soft-brown);
+    color: var(--soft-main-palette);
 }
 
 .form-note {

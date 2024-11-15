@@ -25,8 +25,11 @@ defineProps({
 <template>
     <nav class="navbar flex column wide">
         <div class="bar-elements flex">
-            <div :class="{ 'active': activeMore }" @click="toggleMore(); updateHeight()"></div>
-            <h1 class="bar-title">{{ title }}</h1>
+            <div class="toggle-more" :class="{ 'active': activeMore }" @click="toggleMore(); updateHeight()"></div>
+            <div class="title-container flex y-centered">
+                <img class="logo-image" src="/img/logo.png" alt="Logo">
+                <h1 class="bar-title">{{ title }}</h1>
+            </div>
             <router-link class="cart-container flex" :to="{ name: 'Cart' }">
                 <div class="flex">
                     <Transition name="fade">
@@ -52,6 +55,9 @@ defineProps({
                     </div>
                 </div>
                 <div class="flex column y-centered x-centered">
+                    <div class="flex">
+                        
+                    </div>
                     <p class="software-info">{{ $t('mobileBar.softwareInfo') }}<br>{{ $t('mobileBar.author') }}</p>
                 </div>
             </div>
@@ -91,7 +97,7 @@ export default {
     border-bottom: 3px solid var(--white-soft);
     height: 50px;
     margin-bottom: 15px;
-    background: var(--intense-brown);
+    background: var(--intense-main-palette);
     z-index: 47;
 }
 
@@ -101,7 +107,7 @@ export default {
     padding: 8px 8px 6px 8px;
 }
 
-.bar-elements>div {
+.bar-elements>.toggle-more {
     width: 35px;
     height: 35px;
     cursor: pointer;
@@ -110,10 +116,14 @@ export default {
     z-index: 47;
 }
 
-.bar-elements>div.active {
+.bar-elements>.toggle-more.active {
     border-radius: 8px;
-    background-color: var(--intense-brown);
+    background-color: var(--intense-main-palette);
     transition: linear background-color 0.3s;
+}
+
+.logo-image {
+    width: 48px;
 }
 
 .bar-title {
@@ -139,7 +149,7 @@ export default {
 }
 
 .cart-container.router-link-active {
-    background-color: var(--light-brown);
+    background-color: var(--reddish-main-palette);
 }
 
 .cart-count-container {
@@ -160,7 +170,7 @@ export default {
 }
 
 .buttons-container {
-    background-color: var(--intense-brown);
+    background-color: var(--soft-beige);
     border-top-right-radius: 10px;
     border-bottom-right-radius: 10px;
     position: fixed;
@@ -175,7 +185,7 @@ export default {
 .buttons-container-title {
     height: 50px;
     border-top-right-radius: 10px;
-    background-color: var(--light-brown);
+    background-color: var(--soft-beige);
     color: var(--black-mute);
 }
 
@@ -191,7 +201,7 @@ export default {
 
 .link-button.router-link-active {
     color: var(--pale-tone);
-    background-color: var(--soft-brown);
+    background-color: var(--soft-main-palette);
     border: 2px inset var(--indigo-dark);
     border-radius: 4px;
     font-weight: bold;
@@ -203,7 +213,7 @@ export default {
 
 .software-info {
     font-size: 12px;
-    color: var(--pale-tone);
+    color: var(--black-soft);
     text-align: center;
 }
 

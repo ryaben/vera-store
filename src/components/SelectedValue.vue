@@ -32,7 +32,7 @@ export default {
     align-items: center;
     border-radius: 13px;
     width: fit-content;
-    background-color: var(--soft-brown);
+    background-color: var(--soft-main-palette);
     padding: 3px;
     margin: 6px 3px 0 0;
 }
