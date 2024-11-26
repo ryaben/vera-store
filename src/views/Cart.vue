@@ -42,7 +42,7 @@ defineProps({
 
                 <div class="flex column y-centered">
                     <CartCard class="cart-card" v-for="(cartItem, i) in differentItemsInCart" :key="i"
-                        :item-info="cartItem" :cart="cartList" />
+                        :item-info="cartItem" :cart-list="cartList" />
                 </div>
             </div>
 
@@ -94,7 +94,9 @@ defineProps({
                                 <span v-if="redeemedCoupon.couponIncludeSaleItems">{{ $t("cart.includesSale") }}</span>
                                 <span v-if="!redeemedCoupon.couponIncludeSaleItems">{{ $t("cart.notIncludesSale")
                                     }}</span>
-                                <span>{{ $t("cart.minimumSpend") }} ${{ redeemedCoupon.couponMinimumSpend }}.</span>
+                                <span>{{ $t("cart.minimumSpend") }} ${{ redeemedCoupon.couponMinimumSpend }}, </span>
+                                <span>{{ $t("cart.maximumDiscount") }} ${{ redeemedCoupon.couponMaximumDiscount
+                                    }}.</span>
                             </p>
                         </div>
                     </AnimateHeight>
@@ -185,20 +187,21 @@ export default {
         },
         calculateCouponDiscountAmount() {
             const that = this;
+            let discountAmount;
 
             try {
                 if (this.redeemedCoupon.couponMinimumSpend > (this.cartTotal.totalValue + this.cartTotal.totalValueSales)) {
-                    return 0;
+                    discountAmount = 0;
                 } else {
                     if (this.redeemedCoupon.couponAppliesOn === 'cart') {
                         if (this.redeemedCoupon.couponType === 'fixed') {
-                            return this.redeemedCoupon.couponAmount;
+                            discountAmount = this.redeemedCoupon.couponAmount;
                         }
                         else if (this.redeemedCoupon.couponType === 'percentage') {
                             if (this.redeemedCoupon.couponIncludeSaleItems) {
-                                return ((this.redeemedCoupon.couponAmount / 100) * (this.cartTotal.totalValue + this.cartTotal.totalValueSales));
+                                discountAmount = ((this.redeemedCoupon.couponAmount / 100) * (this.cartTotal.totalValue + this.cartTotal.totalValueSales));
                             } else {
-                                return ((this.redeemedCoupon.couponAmount / 100) * this.cartTotal.totalValue);
+                                discountAmount = ((this.redeemedCoupon.couponAmount / 100) * this.cartTotal.totalValue);
                             }
                         }
                     } else {
@@ -218,7 +221,7 @@ export default {
                                     addMatchingItemsPrice();
                                 }
                             } else if (that.redeemedCoupon.couponAppliesOn === 'itemsByCategory') {
-                                if (that.arrayContainsAny(that.redeemedCoupon.couponAppliesOnItems, item.itemCategories)) {
+                                if (that.arrayContainsAny(that.redeemedCoupon.couponAppliesOnItems, item.itemCategories[that.$i18n.locale])) {
                                     addMatchingItemsPrice();
                                 }
                             }
@@ -226,27 +229,39 @@ export default {
 
                         if (this.redeemedCoupon.couponType === 'fixed') {
                             if (this.redeemedCoupon.couponAmount > itemsTotalWithoutDiscount) {
-                                return itemsTotalWithoutDiscount;
+                                discountAmount = itemsTotalWithoutDiscount;
                             } else {
-                                return this.redeemedCoupon.couponAmount;
+                                discountAmount = this.redeemedCoupon.couponAmount;
                             }
                         } else if (this.redeemedCoupon.couponType === 'percentage') {
-                            return (this.redeemedCoupon.couponAmount / 100) * itemsTotalWithoutDiscount;
+                            discountAmount = (this.redeemedCoupon.couponAmount / 100) * itemsTotalWithoutDiscount;
                         }
                     }
                 }
             } catch {
-                return 0;
+                discountAmount = 0;
             }
+
+            try {
+                if (discountAmount > this.redeemedCoupon.couponMaximumDiscount) discountAmount = this.redeemedCoupon.couponMaximumDiscount;
+                return discountAmount;
+            } catch {
+                return discountAmount;
+            }
+
         },
         async clearCart() {
             await store.dispatch("clearCart");
+            this.saveCartInStorage();
         },
         async setCheckoutAmount() {
             await store.dispatch("setCheckoutAmount", { amount: this.cartTotalWithDiscount });
         },
         arrayContainsAny(array1, array2) {
             return array1.some(item => array2.includes(item));
+        },
+        saveCartInStorage() {
+            localStorage.setItem("shoppingCart", JSON.stringify(this.cartList));
         },
         redeemNotification() {
             notify({
@@ -262,13 +277,15 @@ export default {
                 type: "error"
             });
         },
+    },
+    async beforeMount() {
+        if (!this.couponsList.length) { await store.dispatch('getCoupons'); }
     }
 }
 </script>
 
 <style scoped>
 .form-title {
-    font-size: 24px;
     margin-top: 0;
     margin-bottom: 2.5%;
 }
@@ -297,7 +314,6 @@ div.right-border {
 
 .total-price {
     font-weight: bold;
-    color: var(--black-soft);
 }
 
 .total-price.discounted {
@@ -323,6 +339,7 @@ div.right-border {
     margin-left: auto;
     margin-right: auto;
     width: 75%;
+    max-width: 350px;
     padding: 10px;
     background: var(--success-tone);
     color: var(--white-soft);
@@ -333,7 +350,7 @@ div.right-border {
     margin-bottom: 0;
 }
 
-@media (prefers-color-scheme: light) {
+.master-container.light {
 
     .cart-container.bordered,
     div.right-border {

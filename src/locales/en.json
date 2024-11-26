@@ -12,14 +12,20 @@
         "navBarFAQsButton": "FAQs",
         "navBarAboutUsButton": "About us",
         "navBarInfoButton": "Info",
-        "navBarProductsButton": "Products"
+        "navBarProductsButton": "Products",
+        "navBarAdminPanelButton": "Admin panel"
     },
     "aboutUs": {},
     "adminPanel": {
+        "loading": "Loading resources...",
+        "adminPassword": "Admin password",
+        "accessPanel": "Access panel",
         "itemsTabTitle": "Store items",
         "ordersTabTitle": "Customer orders",
         "hostsTabTitle": "Partner hosts",
-        "couponsTabTitle": "Store coupons"
+        "couponsTabTitle": "Store coupons",
+        "wrongPasswordTitle": "Wrong password",
+        "wrongPasswordText": "The admin password you input is incorrect."
     },
     "cart": {
         "title": "Shopping cart",
@@ -39,9 +45,10 @@
         "enjoy": "Enjoy ",
         "offOn": " off on",
         "entirePurchase": "your entire purchase.",
-        "includesSale": " Includes items on sale",
-        "notIncludesSale": " Does not include items on sale",
-        "minimumSpend": " and the minimum spend is",
+        "includesSale": " Includes items on sale.",
+        "notIncludesSale": " Does not include items on sale.",
+        "minimumSpend": " The minimum spend is",
+        "maximumDiscount": " and the maximum discount is ",
         "redeemNotificationTitle": "Coupon successfully redeemed",
         "redeemNotificationText": "The coupon code you entered is valid, a discount is now active!",
         "redeemFailureNotificationTitle": "Coupon was not redeemed",
@@ -54,6 +61,13 @@
         "formField1": "Full name",
         "formField2": "Email address",
         "formField3": "Host location",
+        "formFieldDate": "Check-out date",
+        "namePlaceholder": "John Doe",
+        "emailPlaceholder": "john.doe at email.com",
+        "today": "Today",
+        "selectDate": "Pick",
+        "cancelDate": "Cancel",
+        "placeholderDate": "Select a date",
         "selected": "Selected:",
         "noneSelected": "None.",
         "formSectionTitle2": "Payment procedure",
@@ -74,10 +88,12 @@
     },
     "faqs": {
         "title": "Frequently Asked Questions",
-        "questionTitle1": "Who are we?",
+        "questionTitle1": "Who are you?",
         "questionContent1": "We are a family business and retail store dedicated to provide the most wonderful delicatessen goods to tourists and travelers that visit Argentina!",
-        "questionTitle2": "Why choosing us?",
+        "questionTitle2": "Why choosing you?",
         "questionContent2": "We offer a very convenient all-in-one solution for your souvenir purchases in Argentina. Rather than having to visit dozens of retail stores that sell different items with high prices and wasting your valuable time, you can simply order everything here from the comfort of your mobile phone and have it delivered to you at the place you are staying at! Spend your time traveling the city and visiting real touristic places, we'll handle the shopping for you and provide you with everything you want.",
+        "questionTitle3": "When and where do you deliver orders?",
+        "questionContent3": "We will deliver and hand the package of items to you at the partner location you are staying on, on your check-out date. We maintain coordination and work alongisde all our partner lodging places in order to successfully achieve this. We think that delivering your order just before the check-out moment is the best option to do so, because we won't interrupt your vacations by requiring you to stay on that place to receive the package, and you'll most surely be present in the lodging partner on the time you have to leave it.",
         "missingQuestion": "Your question isn't here?",
         "reachOut": "Reach out to us and ask anything!"
     },
@@ -106,6 +122,7 @@
         "searchPlaceholder": "Search items...",
         "toolsTitle1": "Categories",
         "categoriesSelectLabel": "Tap to select",
+        "categoriesSelectedLabel": "Selected",
         "categoriesDeselectLabel": "Tap to remove",
         "categoriesPlaceholder": "Search or select a category",
         "toolsTitle2": "Price",
@@ -121,7 +138,7 @@
         "sortingOption5": "Price (lowest)",
         "sortingOption6": "Price (highest)",
         "sortingOption7": "Random",
-        "pageControl": "Page control",
+        "pageControl": "Pages",
         "availabilityToggle": "Available items only",
         "searchTabTitle": "Search",
         "categoriesTabTitle": "Category",
@@ -135,6 +152,8 @@
         "moreInfo": "More info...",
         "unavailable": "Currently unavailable",
         "addToCart": "Add to cart",
+        "addToCart1": "Add ",
+        "addToCart2": " to cart",
         "addedToCart": "Added!",
         "saleTag": "SALE"
     },
@@ -167,6 +186,7 @@
         "link": "Link:",
         "updateOrder": "Update order",
         "title": "Title:",
+        "languageProfiles": "Profiles by language:",
         "price": "Price:",
         "priceSale": "On sale:",
         "categories": "Categories:",
@@ -206,6 +226,7 @@
         "couponActive": "Active",
         "otherProperties": "Other properties:",
         "minimumSpend": "Minimum spend:",
+        "maximumDiscount": "Maximum discount:",
         "addNewCoupon": "Add new coupon",
         "updateCoupon": "Update coupon",
         "deleteEntry": "This will permanently delete the entry and everything related to it. Do you want to proceed?",
@@ -224,5 +245,11 @@
         "currentlyUnavailable": "Currently unavailable.",
         "select": "Select",
         "selected": "✅ Selected"
+    },
+    "desktopFooter": {
+        "contactUs": "Contact us",
+        "sitemap": "Sitemap",
+        "globalSettings": "Global settings",
+        "darkMode": "Dark mode"
     }
 }

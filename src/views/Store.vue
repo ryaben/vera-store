@@ -4,6 +4,7 @@ import ItemCard from '../components/ItemCard.vue';
 import Multiselect from 'vue-multiselect';
 import VueToggle from "vue-toggle-component";
 import TabSelector from '../components/TabSelector.vue';
+import LoadingGIF from '../components/LoadingGIF.vue';
 import { useWindowSize } from 'vue-window-size';
 const { width } = useWindowSize();
 const windowWidth = width;
@@ -42,6 +43,7 @@ defineProps({
                     <p v-if="windowWidth > 850" class="tools-title bold">{{ $t('store.toolsTitle1') }}</p>
                     <Multiselect v-model="filteredCategories" :options="categoriesInItems" :multiple="true"
                         :select-label="$t('store.categoriesSelectLabel')"
+                        :selected-label="$t('store.categoriesSelectedLabel')"
                         :placeholder="$t('store.categoriesPlaceholder')"
                         :deselect-label="$t('store.categoriesDeselectLabel')" open-direction="below"
                         @select="filterByCategory" @remove="filterByCategory" class="category-selector" />
@@ -50,12 +52,10 @@ defineProps({
                     <p v-if="windowWidth > 850" class="tools-title bold">{{ $t('store.toolsTitle2') }}</p>
                     <label class="tab-label" for="itemMinPrice">
                         <input class="item-price" type="number" name="itemPrice" v-model="filteredPrice.min"
-                            :placeholder="$t('store.itemPricePlaceholder1')" min="1" @input="fixPrices(); filterByPrice"
-                            @change="fixPrices(); filterByPrice()">
+                            :placeholder="$t('store.itemPricePlaceholder1')" min="1" @input="filterByPrice">
                         &nbsp;—&nbsp;
                         <input class="item-price" type="number" name="itemPrice" v-model="filteredPrice.max"
-                            :placeholder="$t('store.itemPricePlaceholder2')" min="1" @input="fixPrices(); filterByPrice"
-                            @change="fixPrices(); filterByPrice()">
+                            :placeholder="$t('store.itemPricePlaceholder2')" min="1" @input="filterByPrice">
                     </label>
                 </div>
                 <div v-show="windowWidth > 850 || selectedTab === 'availability'" class="flex tab-wrapper"
@@ -65,10 +65,7 @@ defineProps({
                         @toggle="toggleAvailability" />
                 </div>
             </div>
-            <div class="loading-gif flex column x-centered y-centered top-margin" v-if="!itemsList.length">
-                <img class="loading-image" src="/img/loading.gif" alt="Loading">
-                <p>{{ $t('store.loading') }}</p>
-            </div>
+            <LoadingGIF :visible="!itemsList.length" :description="$t('store.loading')" />
             <Transition name="fade">
                 <div v-if="itemsList.length" id="resultsContainer" class="flex column wide">
                     <div class="display-tools flex y-centered wide space-between bottom-margin">
@@ -96,7 +93,7 @@ defineProps({
                     <p class="top-margin centered-text" v-if="itemsList.length && !visibleElements.length">
                         {{ $t('store.noResults') }}
                     </p>
-                    <div class="pages-container flex column y-centered top-margin">
+                    <div class="pages-container flex column y-centered top-margin bottom-margin">
                         <label for="">{{ $t('store.pageControl') }}</label>
                         <vue-awesome-paginate :total-items="visibleElements.length" :items-per-page="itemsPerPage"
                             :max-pages-shown="3" v-model="currentPage" :show-ending-buttons="true"
@@ -113,7 +110,7 @@ defineProps({
 export default {
     name: 'Store',
     components: {
-        ItemCard, Multiselect, TabSelector, VueToggle
+        ItemCard, Multiselect, TabSelector, VueToggle, LoadingGIF
     },
     data() {
         return {
@@ -140,14 +137,24 @@ export default {
             if (newValue.length) {
                 this.pageElements();
             }
+        },
+        filteredPrice(newValue) {
+            this.filteredPrice.min = Math.abs(newValue.min);
+            this.filteredPrice.max = Math.abs(newValue.max);
+
+            if (newValue.min < 1) this.filteredPrice.min = 1;
+            if (newValue.max > 1000) this.filteredPrice.max = 1000;
+            if (newValue.min > this.filteredPrice.max) this.filteredPrice.min = this.filteredPrice.max;
+            if (newValue.max < this.filteredPrice.min) this.filteredPrice.max = this.filteredPrice.min;
         }
     },
     computed: {
         categoriesInItems() {
+            const that = this;
             let categories = [];
 
             this.itemsList.forEach(function (item) {
-                item.itemCategories.forEach(function (itemCategory) {
+                item.itemCategories[that.$i18n.locale].forEach(function (itemCategory) {
                     const categoryCheck = categories.find(function (category) {
                         return category === itemCategory;
                     });
@@ -179,12 +186,6 @@ export default {
         setPage(result) {
             this.currentPage = result;
             this.pageElements();
-        },
-        fixPrices() {
-            if (this.filteredPrice.min < 1) this.filteredPrice.min = 1;
-            if (this.filteredPrice.max > 1000) this.filteredPrice.max = 1000;
-            if (this.filteredPrice.min > this.filteredPrice.max) this.filteredPrice.min = this.filteredPrice.max;
-            if (this.filteredPrice.max < this.filteredPrice.min) this.filteredPrice.max = this.filteredPrice.min;
         },
         pageElements() {
             const that = this;
@@ -266,7 +267,7 @@ export default {
                 });
             } else {
                 this.itemsList.forEach(function (element) {
-                    that.arrayContainsAny(element.itemCategories, that.filteredCategories) ? element.categoryDisplay = true : element.categoryDisplay = false;
+                    that.arrayContainsAny(element.itemCategories[that.$i18n.locale], that.filteredCategories) ? element.categoryDisplay = true : element.categoryDisplay = false;
                 });
             }
 
@@ -277,7 +278,16 @@ export default {
             const maxPrice = this.filteredPrice.max === '' ? Infinity : this.filteredPrice.max;
 
             this.itemsList.forEach(function (element) {
-                element.itemPrice >= minPrice && element.itemPrice <= maxPrice ? element.priceDisplay = true : element.priceDisplay = false;
+                switch (element.itemOnSale) {
+                    case true:
+                        element.itemPriceSale >= minPrice && element.itemPriceSale <= maxPrice ? element.priceDisplay = true : element.priceDisplay = false;
+                        break;
+                    case false:
+                        element.itemPrice >= minPrice && element.itemPrice <= maxPrice ? element.priceDisplay = true : element.priceDisplay = false;
+                        break;
+                    default:
+                        break;
+                }
             });
 
             this.pageElements();
@@ -312,6 +322,12 @@ export default {
         normalizeString(string) {
             return string.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
         }
+    },
+    async beforeMount() {
+        if (!this.itemsList.length) { await store.dispatch('getItems'); }
+    },
+    mounted() {
+        this.pageElements();
     }
 }
 </script>
@@ -327,10 +343,6 @@ export default {
     position: relative;
     flex-direction: column;
     justify-content: right;
-}
-
-.loading-gif {
-    width: 100%;
 }
 
 .store-tools {
@@ -431,9 +443,9 @@ div.section-selector-container {
 
 .multiselect.sort-selector {
     font-weight: normal;
-    width: 35%;
+    width: 40%;
     min-width: 180px;
-    max-width: 300px;
+    max-width: 320px;
 }
 
 #itemavailability-label {
@@ -445,7 +457,7 @@ div.section-selector-container {
     border-top: 1px solid var(--white-soft);
 }
 
-@media (prefers-color-scheme: light) {
+.master-container.light {
 
     .products-amount,
     .display-tools,
@@ -455,13 +467,15 @@ div.section-selector-container {
 }
 
 @media only screen and (min-width: 850px) {
+    .master-container.light {
+        .store-tools {
+            border-color: var(--black-soft);
+        }
+    }
+
     .store-container {
         flex-direction: row;
         justify-content: space-between;
-    }
-
-    .loading-gif {
-        width: 70%;
     }
 
     .store-tools {
@@ -472,7 +486,7 @@ div.section-selector-container {
         border-radius: 6px;
         top: 2.5dvw;
         left: 2.5dvw;
-        margin-right: auto;
+        /* margin-right: auto; */
     }
 
     .products-amount {
@@ -504,12 +518,6 @@ div.section-selector-container {
 
     #availabilityToggle {
         margin-top: 5px;
-    }
-}
-
-@media (prefers-color-scheme: light) and (min-width: 850px) {
-    .store-tools {
-        border-color: var(--black-soft);
     }
 }
 

@@ -61,7 +61,7 @@ export default {
     margin: 0;
 }
 
-@media (prefers-color-scheme: light) {
+.master-container.light {
     .card-container {
         border-color: var(--black-soft);
     }

@@ -2,13 +2,15 @@
 import store from '../store';
 import axios from "axios";
 import AnimateHeight from 'vue-animate-height';
+import VueDatePicker from '@vuepic/vue-datepicker';
 import { db } from '../firebase/init.js';
 import { collection, addDoc, Timestamp } from "firebase/firestore";
 import Recaptcha from '../components/ReCaptcha.vue';
 import MapboxMap from '../components/MapboxMap.vue';
+import LoadingGIF from '../components/LoadingGIF.vue';
 import { notify } from "@kyvg/vue3-notification";
 import { useWindowSize } from 'vue-window-size';
-const { width, height } = useWindowSize();
+const { width } = useWindowSize();
 const windowWidth = width;
 
 defineProps({
@@ -38,23 +40,29 @@ defineProps({
 <template>
     <section class="page-section">
         <h2 class="form-title">{{ $t("checkout.title") }}</h2>
-        <div class="flex column y-centered" v-if="processingOrder">
-            <img class="loading-image" src="/img/loading.gif" alt="Loading">
-            <p>{{ $t("checkout.processing") }}</p>
-        </div>
+        <LoadingGIF :visible="processingOrder" :description="$t('checkout.processing')" />
         <form class="form-container flex wide" :class="{ 'column': windowWidth < 1050 }" @submit.prevent="issueOrder">
             <div class="form-subcontainer flex column" :class="{ 'wide right-border': windowWidth >= 1050 }">
                 <h2 class="centered-text">{{ $t("checkout.formSectionTitle1") }}</h2>
-                <div class="form-field flex column y-centered">
+                <div class="form-field flex column y-centered bottom-margin">
                     <label for="checkoutFormName">{{ $t("checkout.formField1") }}</label>
-                    <input type="text" id="checkoutFormName" required placeholder="John Doe" v-model="customerName">
+                    <input type="text" id="checkoutFormName" required :placeholder="$t('checkout.namePlaceholder')" v-model="customerName">
                 </div>
-                <div class="form-field flex column y-centered">
+                <div class="form-field flex column y-centered bottom-margin">
                     <label for="checkoutFormEmail">{{ $t("checkout.formField2") }}</label>
-                    <input type="email" id="checkoutFormEmail" required placeholder="john.doe@email.com"
+                    <input type="email" id="checkoutFormEmail" required :placeholder="$t('checkout.emailPlaceholder')"
                         v-model="customerEmail">
                 </div>
                 <div class="form-field flex column y-centered">
+                    <label>{{ $t("checkout.formFieldDate") }}</label>
+                    <VueDatePicker id="deliveryDate" v-model="deliveryDate" month-name-format="long"
+                        :flow="['year', 'month', 'calendar']" :utc="'preserve'" :timezone="'UTC'"
+                        :now-button-label="$t('checkout.today')" :select-text="$t('checkout.selectDate')"
+                        :cancel-text="$t('checkout.cancelDate')" :placeholder="$t('checkout.placeholderDate')"
+                        :is-24="$i18n.locale === 'en' ? false : true" :min-date="new Date()"
+                        :year-range="[new Date().getFullYear(), new Date().getFullYear() + 1]" :required="true" />
+                </div>
+                <div class="form-field flex column y-centered bottom-margin">
                     <label>{{ $t("checkout.formField3") }}</label>
                     <p>{{ $t("checkout.selected") }}
                         <span v-if="!selectedHost">{{ $t("checkout.noneSelected") }}</span>
@@ -67,17 +75,19 @@ defineProps({
                 </div>
             </div>
 
-            <div class="form-subcontainer flex column" :class="{ 'wide': windowWidth >= 1050, 'top-border': windowWidth < 1050 }">
+            <div class="form-subcontainer flex column"
+                :class="{ 'wide': windowWidth >= 1050, 'top-border': windowWidth < 1050 }">
                 <h2 class="centered-text">{{ $t("checkout.formSectionTitle2") }}</h2>
                 <div class="purchase-overview flex space-between">
                     <p>{{ cartList.length }} {{ $t("checkout.items") }}</p>
-                    <div class="flex" style="margin: auto;">
+                    <div class="flex auto-margin">
                         <select name="orderCurrency" id="currencySelector" v-model="orderCurrency">
                             <option value="usd">USD</option>
                             <option v-if="paymentMethod === 'cash'" value="ars">ARS</option>
                         </select>
                         <p v-if="orderCurrency === 'usd'" class="total-price">{{ checkoutAmount.toFixed(2) }}</p>
-                        <p v-if="orderCurrency === 'ars'" class="total-price">{{ (checkoutAmount * blueDollarRate).toFixed(2)
+                        <p v-if="orderCurrency === 'ars'" class="total-price">{{ (checkoutAmount *
+                            blueDollarRate).toFixed(2)
                             }}
                         </p>
                     </div>
@@ -105,7 +115,7 @@ defineProps({
                                 $t("checkout.payoneerNote2") }}
                     </p>
                 </AnimateHeight>
-                <Recaptcha class="order-recaptcha flex x-centered" @checkbox="checkRecaptcha" />
+                <Recaptcha class="flex x-centered bottom-margin" @checkbox="checkRecaptcha" />
                 <div class="flex wide space-evenly" style="margin-bottom: 20px;">
                     <button class="action-button large red flex y-centered x-centered">
                         <router-link class="flex wide tall x-centered y-centered" :to="{ name: 'Cart' }">
@@ -124,7 +134,7 @@ defineProps({
 export default {
     name: 'Checkout',
     components: {
-        AnimateHeight, Recaptcha
+        AnimateHeight, Recaptcha, VueDatePicker, LoadingGIF
     },
     data() {
         return {
@@ -136,7 +146,8 @@ export default {
             processingOrder: false,
             passedRecaptcha: false,
             orderCurrency: 'usd',
-            selectedHost: undefined
+            selectedHost: undefined,
+            deliveryDate: ''
         }
     },
     computed: {
@@ -170,7 +181,9 @@ export default {
                 paymentLink: '',
                 orderCurrency: this.orderCurrency,
                 orderIssueDate: Timestamp.fromDate(new Date()),
+                orderCheckoutDate: Timestamp.fromDate(this.deliveryDate),
                 orderLocation: this.selectedHost,
+                orderNotes: '',
                 orderStatus: 0,
                 orderPrice: orderAmount,
                 orderItems: this.cartList.map((item) => { return item.id })
@@ -206,6 +219,9 @@ export default {
             return new Date((typeof date === "string" ? new Date(date) : date).toLocaleString("es-AR", { timeZone: tzString }));
         }
     },
+    async beforeMount() {
+        if (!this.partnersList.length) { await store.dispatch('getPartners'); }
+    },
     mounted() {
         const that = this;
         axios.get("https://dolarapi.com/v1/dolares/blue")
@@ -215,6 +231,8 @@ export default {
             .catch(function (error) {
                 return console.log(error);
             });
+
+        
     }
 }
 </script>
@@ -243,13 +261,15 @@ div.right-border {
     border-right: 2px solid var(--white-soft);
 }
 
-.form-field {
-    margin-bottom: 15px;
-}
-
-.form-field input {
+.form-field input,
+#deliveryDate {
     width: 70%;
     max-width: 500px;
+    height: 30px;
+}
+
+#deliveryDate {
+    margin-bottom: 25px;
 }
 
 .purchase-overview {
@@ -291,25 +311,18 @@ div.right-border {
     width: 95%;
 }
 
-.order-recaptcha {
-    margin-bottom: 25px;
-}
-
 .payoneer-text {
     font-weight: bold;
     text-decoration: underline;
     color: var(--payoneer-orange);
 }
 
-@media (prefers-color-scheme: light) {
+.master-container.light {
     .form-container,
     div.right-border,
-    .form-subcontainer.top-border {
-        border-color: var(--black-soft);
-    }
-
+    .form-subcontainer.top-border,
     .purchase-overview {
-        border-color: var(--black);
+        border-color: var(--black-soft);
     }
 }
 </style>

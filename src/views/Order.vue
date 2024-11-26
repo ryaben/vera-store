@@ -1,5 +1,7 @@
 <script setup>
 import store from '../store';
+import LoadingGIF from '../components/LoadingGIF.vue';
+import QRCodeVue3 from 'qrcode-vue3';
 
 defineProps({
     orderID: {
@@ -15,10 +17,7 @@ defineProps({
 
 <template>
     <section class="page-section">
-        <div class="flex column y-centered wide" v-if="!ordersList.length && !orderData">
-            <img class="loading-image" src="/img/loading.gif" alt="Loading">
-            <p>{{ $t("order.loading") }}</p>
-        </div>
+        <LoadingGIF :visible="!ordersList.length && !orderData" :description="$t('order.loading')" />
         <div class="flex column y-centered" v-if="ordersList.length && orderData === undefined">
             <p>{{ $t("order.missingOrder") }}</p>
             <button class="action-button large red flex y-centered x-centered">
@@ -28,13 +27,19 @@ defineProps({
         </div>
         <div v-if="orderData" class="flex column y-centered">
             <h2 class="order-title centered-text">{{ $t("order.title") }}<br>{{ orderData.id }}</h2>
-            <!-- <p class="bottom-margin bold">
-                {{ $t("order.issueDate") }}&nbsp;
-                {{ orderDate.getDate() }}/{{ orderDate.getMonth() + 1 }}/{{ orderDate.getFullYear() }}
-            </p> -->
-            <div style="margin-bottom: 20px;">
+
+            <QRCodeVue3 :value="orderData.id" width="100" height="100"
+                :corners-square-options="{ type: 'square', color: '#000000' }"
+                :corners-dot-options="{ type: 'square', color: '#000000' }" :dots-options="{
+                    type: 'squares',
+                    color: '#000000'
+                }" />
+
+            <div class="top-margin" style="margin-bottom: 20px;">
                 <p class="item-list" v-for="(item, i) in differentItemsInCart" :key="i">
-                    • {{ item.amount }} x {{ itemsList.find((el) => { return el.id === item.id }).itemTitle }}
+                    • {{ item.amount }} x {{ itemsList.find((el) => {
+                        return el.id === item.id
+                    }).itemTitle[$i18n.locale] }}
                 </p>
                 <p class="items-total bold">
                     <span class="uppercased">{{ orderData.orderCurrency }}</span>
@@ -52,17 +57,17 @@ defineProps({
                 <div class="flex x-centered">
                     <p class="status-legend done">{{ $t("global.status0Title") }}</p>
                 </div>
-                &nbsp;
+                <div class="empty"></div>
                 <div class="flex x-centered">
                     <p class="status-legend" :class="{ 'done': orderData.orderStatus > 0 }">{{ $t("global.status1Title")
                         }}</p>
                 </div>
-                &nbsp;
+                <div class="empty"></div>
                 <div class="flex x-centered">
                     <p class="status-legend" :class="{ 'done': orderData.orderStatus > 1 }">{{ $t("global.status2Title")
                         }}</p>
                 </div>
-                &nbsp;
+                <div class="empty"></div>
                 <div class="flex x-centered">
                     <p class="status-legend" :class="{ 'done': orderData.orderStatus > 2 }">{{ $t("global.status3Title")
                         }}</p>
@@ -70,6 +75,17 @@ defineProps({
                 <div class="flex x-centered">
                     <p class="order-date centered-text">
                         {{ orderDate.getDate() }}/{{ orderDate.getMonth() + 1 }}/{{ orderDate.getFullYear() }}
+                    </p>
+                </div>
+                <div class="empty"></div>
+                <div class="empty"></div>
+                <div class="empty"></div>
+                <div class="empty"></div>
+                <div class="empty"></div>
+                <div class="flex x-centered">
+                    <p class="order-date centered-text">
+                        {{ orderCheckoutDate.getDate() }}/{{ orderCheckoutDate.getMonth() + 1 }}/{{
+                            orderCheckoutDate.getFullYear() }}
                     </p>
                 </div>
             </div>
@@ -105,6 +121,9 @@ defineProps({
 <script>
 export default {
     name: 'Order',
+    components: {
+        QRCodeVue3, LoadingGIF
+    },
     data() {
         return {
         }
@@ -121,6 +140,9 @@ export default {
         },
         orderDate() {
             return this.orderData.orderIssueDate.toDate();
+        },
+        orderCheckoutDate() {
+            return this.orderData.orderCheckoutDate.toDate();
         },
         differentItemsInCart() {
             let items = [];
@@ -140,8 +162,9 @@ export default {
             return items;
         }
     },
-    async beforeCreate() {
-        await store.dispatch('getOrders');
+    async beforeMount() {
+        if (!this.itemsList.length) await store.dispatch('getItems');
+        if (!this.ordersList.length) await store.dispatch('getOrders');
     }
 }
 </script>
@@ -218,7 +241,7 @@ export default {
     width: max-content;
 }
 
-@media (prefers-color-scheme: light) {
+.master-container.light {
     .items-total {
         border-color: var(--black);
     }

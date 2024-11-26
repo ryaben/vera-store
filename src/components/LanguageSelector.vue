@@ -13,7 +13,7 @@ defineProps({
         default: false
     },
     openDirection: {
-        type: Boolean,
+        type: String,
         required: false,
         default: "below"
     }
@@ -60,14 +60,14 @@ export default {
             this.$i18n.locale = value;
         },
         saveLanguageOption() {
-            return localStorage.setItem('lang', JSON.stringify(this.displayLanguage));
+            return localStorage.setItem('language', JSON.stringify(this.displayLanguage));
         },
         loadLanguageOption() {
-            return localStorage.getItem('lang');
+            return JSON.parse(localStorage.getItem('language'));
         }
     },
     mounted() {
-        this.displayLanguage = JSON.parse(this.loadLanguageOption());
+        this.displayLanguage = this.loadLanguageOption();
         this.updatei18n(this.displayLanguage.value);
     }
 }
@@ -114,7 +114,7 @@ div.multiselect.language-selector.transparent:deep(div.label-container > span.op
     color: var(--white-soft);
 }
 
-@media (prefers-color-scheme: light) {
+.master-container.light {
     div.multiselect.language-selector.transparent:deep(div.label-container > span.option-title) {
         color: var(--black-soft);
     }

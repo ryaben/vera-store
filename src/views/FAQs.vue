@@ -4,12 +4,14 @@ import DropdownBox from '../components/DropdownBox.vue';
 
 <template>
     <section class="page-section">
-        <h2 class="page-title bottom-margin">{{ $t("faqs.title") }}</h2>
-        <DropdownBox v-for="(question, i) in [
+        <h2 class="page-title">{{ $t("faqs.title") }}</h2>
+        <div class="flex wide column y-centered">
+            <DropdownBox v-for="(question, i) in [
                 { title: $t('faqs.questionTitle1'), content: $t('faqs.questionContent1') },
-                { title: $t('faqs.questionTitle2'), content: $t('faqs.questionContent2') }
-            ]" :key="i" :box-title="question.title"
-            :box-content="question.content" />
+                { title: $t('faqs.questionTitle2'), content: $t('faqs.questionContent2') },
+                { title: $t('faqs.questionTitle3'), content: $t('faqs.questionContent3') }
+            ]" :key="i" :box-title="question.title" :box-content="question.content" />
+        </div>
 
         <p class="top-margin centered-text">
             {{ $t("faqs.missingQuestion") }}
@@ -29,7 +31,7 @@ export default {
     },
     data() {
         return {
-           
+
         }
     }
 }
@@ -38,7 +40,6 @@ export default {
 <style scoped>
 .page-title {
     margin-top: 0;
+    margin-bottom: 2.5dvw;
 }
-
-@media (prefers-color-scheme: light) {}
 </style>

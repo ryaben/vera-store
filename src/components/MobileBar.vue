@@ -1,5 +1,6 @@
 <script setup>
 import LanguageSelector from './LanguageSelector.vue';
+import DarkModeToggle from './DarkModeToggle.vue';
 
 defineProps({
     title: {
@@ -26,14 +27,16 @@ defineProps({
     <nav class="navbar flex column wide">
         <div class="bar-elements flex">
             <div class="toggle-more" :class="{ 'active': activeMore }" @click="toggleMore(); updateHeight()"></div>
-            <div class="title-container flex y-centered">
+            <div class="title-container flex">
                 <img class="logo-image" src="/img/logo.png" alt="Logo">
                 <h1 class="bar-title">{{ title }}</h1>
             </div>
             <router-link class="cart-container flex" :to="{ name: 'Cart' }">
                 <div class="flex">
                     <Transition name="fade">
-                        <div v-if="itemCount > 0" class="cart-count-container flex"><label>{{ itemCount }}</label></div>
+                        <div v-if="itemCount > 0" class="cart-count-container flex x-centered y-centered">
+                            <label>{{ itemCount }}</label>
+                        </div>
                     </Transition>
                 </div>
             </router-link>
@@ -48,17 +51,16 @@ defineProps({
                     </div>
                     <router-link class="link-button flex" v-for="(link, i) in links" :key="i" :to="{ name: link.route }"
                         @click="toggleMore">
-                        <p>{{ link.text }}</p>
+                        <p class="auto-margin">{{ link.text }}</p>
                     </router-link>
-                    <div class="flex x-centered top-margin">
-                        <LanguageSelector />
-                    </div>
                 </div>
                 <div class="flex column y-centered x-centered">
-                    <div class="flex">
-                        
+                    <div class="flex column y-centered x-centered">
+                        <LanguageSelector :open-direction="'above'" class="bottom-margin" />
+                        <DarkModeToggle @dark-mode-toggled="toggleDarkMode" />
                     </div>
-                    <p class="software-info">{{ $t('mobileBar.softwareInfo') }}<br>{{ $t('mobileBar.author') }}</p>
+                    <p class="software-info top-margin">{{ $t('mobileBar.softwareInfo') }}<br>{{ $t('mobileBar.author')
+                        }}</p>
                 </div>
             </div>
         </Transition>
@@ -68,9 +70,9 @@ defineProps({
 <script>
 export default {
     name: 'MobileBar',
-    emits: ['toggled-bar'],
+    emits: ['toggledBar', 'darkModeToggled'],
     components: {
-        LanguageSelector
+        LanguageSelector, DarkModeToggle
     },
     data() {
         return {
@@ -85,6 +87,9 @@ export default {
         },
         updateHeight() {
             return this.height = this.height === 0 ? 'auto' : 0;
+        },
+        toggleDarkMode(value) {
+            this.$emit("darkModeToggled", value);
         }
     }
 }
@@ -99,6 +104,10 @@ export default {
     margin-bottom: 15px;
     background: var(--intense-main-palette);
     z-index: 47;
+}
+
+.title-container {
+    align-items: flex-end;
 }
 
 .bar-elements {
@@ -123,13 +132,13 @@ export default {
 }
 
 .logo-image {
-    width: 48px;
+    width: 32px;
 }
 
 .bar-title {
     font-size: 18px;
     font-weight: bold;
-    margin: 0;
+    margin: 0 0 0 2px;
     color: var(--white-soft);
 }
 
@@ -154,8 +163,6 @@ export default {
 
 .cart-count-container {
     position: absolute;
-    justify-content: center;
-    align-items: center;
     top: -6px;
     right: -6px;
     width: 18px;
@@ -173,6 +180,7 @@ export default {
     background-color: var(--soft-beige);
     border-top-right-radius: 10px;
     border-bottom-right-radius: 10px;
+    color: var(--black-soft);
     position: fixed;
     left: 0;
     top: 0;
@@ -207,17 +215,12 @@ export default {
     font-weight: bold;
 }
 
-.link-button p {
-    margin: auto;
-}
-
 .software-info {
     font-size: 12px;
-    color: var(--black-soft);
     text-align: center;
 }
 
-@media (prefers-color-scheme: light) {
+.master-container.light {
     .navbar {
         border-color: var(--black-soft);
     }

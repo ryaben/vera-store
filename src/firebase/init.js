@@ -13,7 +13,6 @@ const firebaseConfig = {
   apiKey: firebaseToken,
   authDomain: "vera-souvenirs.firebaseapp.com",
   projectId: "vera-souvenirs",
-  storageBucket: "vera-souvenirs.appspot.com",
   messagingSenderId: "830799424830",
   appId: "1:830799424830:web:00b2d7e900fc9f1e8e906f",
   measurementId: "G-03LEXKGLBK",

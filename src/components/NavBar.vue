@@ -1,6 +1,5 @@
 <script setup>
 import NavbarButton from './NavbarButton.vue';
-import LanguageSelector from './LanguageSelector.vue';
 
 defineProps({
     logo: {
@@ -24,7 +23,7 @@ defineProps({
 </script>
 
 <template>
-    <nav class="navbar flex column">
+    <nav class="navbar flex column auto-margin">
         <div class="bar-elements flex x-centered bottom-margin top-margin">
             <img class="logo-image" :src="logo" alt="Logo">
             <div class="flex column y-centered bottom-margin" style="justify-content: flex-end;">
@@ -33,7 +32,6 @@ defineProps({
             </div>
         </div>
         <div class="links-container flex x-centered">
-            <!-- <LanguageSelector /> -->
             <div class="flex">
                 <NavbarButton v-for="(item, i) in buttons" :key="i" :text="item.text" :icon="item.icon"
                     :route="item.route" :sub-buttons="item.subButtons" />
@@ -56,7 +54,7 @@ defineProps({
 export default {
     name: 'NavBar',
     components: {
-        NavbarButton, LanguageSelector
+        NavbarButton
     },
     data() {
         return {
@@ -70,7 +68,6 @@ export default {
 <style scoped>
 .navbar {
     width: 95%;
-    margin: auto;
     margin-top: 20px;
     background: var(--intense-main-palette);
     border-radius: 8px;
@@ -166,7 +163,7 @@ div.multiselect.language-selector {
     font-size: 12px;
 }
 
-@media (prefers-color-scheme: light) {
+.master-container.light {
     .links-container {
         border-color: var(--black-soft);
     }

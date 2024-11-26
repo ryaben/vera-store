@@ -14,7 +14,7 @@ defineProps({
             price: 1
         }]
     },
-    cart: {
+    cartList: {
         type: Array,
         required: false,
         default: store.getters.cart
@@ -25,10 +25,10 @@ defineProps({
 <template>
     <div class="item-card-wrapper flex x-centered">
         <div class="item-card flex wide">
-            <img class="item-photo" :src="itemInfo.itemPhoto" alt="Photo">
+            <img class="item-photo" :src="itemInfo.itemPhoto[0]" alt="Main photo">
             <div class="item-info-container flex column">
                 <div class="flex column">
-                    <h2 class="item-title">{{ itemInfo.itemTitle }}</h2>
+                    <h2 class="item-title">{{ itemInfo.itemTitle[$i18n.locale] }}</h2>
                     <div class="flex y-centered">
                         <div class="remove-icon" @click="removeItems"></div>
                         <label @click="removeItems">{{ $t('cartCard.remove') }}</label>
@@ -44,10 +44,10 @@ defineProps({
                         <span> = </span>
                         <span class="item-price total">
                             <span v-if="!itemInfo.itemOnSale">
-                                ${{(cartItemCount.length * itemInfo.itemPrice.toFixed(2)).toFixed(2)}}
+                                ${{ (cartItemCount.length * itemInfo.itemPrice.toFixed(2)).toFixed(2) }}
                             </span>
                             <span v-if="itemInfo.itemOnSale">
-                                ${{(cartItemCount.length * itemInfo.itemPriceSale.toFixed(2)).toFixed(2)}}
+                                ${{ (cartItemCount.length * itemInfo.itemPriceSale.toFixed(2)).toFixed(2) }}
                             </span>
                         </span>
                     </label>
@@ -67,7 +67,7 @@ export default {
     computed: {
         cartItemCount() {
             const that = this;
-            return this.cart.filter(function (element) {
+            return this.cartList.filter(function (element) {
                 return element.id === that.itemInfo.id;
             });
         }
@@ -75,12 +75,16 @@ export default {
     methods: {
         async removeItems() {
             const that = this;
-            const filteredCart = this.cart.filter(function (element) {
+            const filteredCart = this.cartList.filter(function (element) {
                 return element.id !== that.itemInfo.id;
             });
 
             await store.dispatch("clearCart");
             await store.dispatch("addToCart", { addedToCart: filteredCart });
+            this.saveCartInStorage(filteredCart);
+        },
+        saveCartInStorage(array) {
+            localStorage.setItem("shoppingCart", JSON.stringify(array));
         }
     }
 }
@@ -145,7 +149,7 @@ export default {
     color: var(--black-soft);
 }
 
-@media (prefers-color-scheme: light) {
+.master-container.light {
     .item-card-wrapper {
         border-color: var(--indigo);
     }

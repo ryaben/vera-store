@@ -1,6 +1,6 @@
 <script setup>
 import LanguageSelector from './LanguageSelector.vue';
-import VueToggle from "vue-toggle-component";
+import DarkModeToggle from './DarkModeToggle.vue';
 </script>
 
 <template>
@@ -14,27 +14,33 @@ import VueToggle from "vue-toggle-component";
             </p>
         </div>
         <div class="flex column left">
-            <p class="column-title bold">Contact us</p>
+            <p class="column-title bold">{{ $t('desktopFooter.contactUs') }}</p>
             <a class="anchor-button email flex y-centered x-centered color-transition" id="sendEmail"
                 href="mailto:argentinadelishop@gmail.com" target="_blank">Email</a>
             <a class="anchor-button whatsapp flex y-centered x-centered color-transition" id="sendEmail"
                 href="https://api.whatsapp.com/send?phone=5491132703200" target="_blank">WhatsApp</a>
         </div>
         <div class="flex column left">
-            <p class="column-title bold">Sitemap</p>
+            <p class="column-title bold">{{ $t('desktopFooter.sitemap') }}</p>
             <div class="sitemap-grid">
-                <router-link class="sitemap-link" :to="{ name: 'Home' }">Home</router-link>
-                <router-link class="sitemap-link" :to="{ name: 'Store' }">Products</router-link>
-                <router-link class="sitemap-link" :to="{ name: 'Cart' }">Cart</router-link>
-                <router-link class="sitemap-link" :to="{ name: 'FAQs' }">FAQs</router-link>
-                <router-link class="sitemap-link" :to="{ name: 'AboutUs' }">About us</router-link>
-                <router-link class="sitemap-link" :to="{ name: 'AdminPanel' }">Admin Panel</router-link>
+                <router-link class="sitemap-link" :to="{ name: 'Home' }">{{ $t('app.navBarHomeButton')
+                    }}</router-link>
+                <router-link class="sitemap-link" :to="{ name: 'Store' }">{{ $t('app.navBarProductsButton')
+                    }}</router-link>
+                <router-link class="sitemap-link" :to="{ name: 'Cart' }">{{ $t('app.navBarCartButton')
+                    }}</router-link>
+                <router-link class="sitemap-link" :to="{ name: 'FAQs' }">{{ $t('app.navBarFAQsButton')
+                    }}</router-link>
+                <router-link class="sitemap-link" :to="{ name: 'AboutUs' }">{{ $t('app.navBarAboutUsButton')
+                    }}</router-link>
+                <router-link class="sitemap-link" :to="{ name: 'AdminPanel' }">{{ $t('app.navBarAdminPanelButton')
+                    }}</router-link>
             </div>
         </div>
         <div class="flex column left">
-            <p class="column-title bold">Global settings</p>
+            <p class="column-title bold">{{ $t('desktopFooter.globalSettings') }}</p>
             <LanguageSelector class="bottom-margin" open-direction="above" />
-            <VueToggle name="darkMode" title="Dark mode" active-color="var(--reddish-main-palette)" font-size="16px" />
+            <DarkModeToggle @dark-mode-toggled="toggleDarkMode" />
         </div>
     </footer>
 </template>
@@ -43,12 +49,18 @@ import VueToggle from "vue-toggle-component";
 export default {
     name: 'Desktop Footer',
     components: {
-        LanguageSelector, VueToggle
+        LanguageSelector, DarkModeToggle
     },
+    emits: ['darkModeToggled'],
     data() {
         return {
         }
-    }
+    },
+    methods: {
+        toggleDarkMode(value) {
+            this.$emit("darkModeToggled", value);
+        },
+    },
 }
 </script>
 
@@ -58,7 +70,7 @@ footer {
     padding-top: 15px;
     background: var(--intense-main-palette);
     color: var(--white-soft);
-    height: 180px;
+    min-height: 180px;
 }
 
 .logo-image {
@@ -117,6 +129,4 @@ footer {
     margin-right: 5px;
     background-image: url("/img/email.png");
 }
-
-@media (prefers-color-scheme: light) {}
 </style>

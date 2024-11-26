@@ -98,8 +98,6 @@ div.multiselect.language-selector {
     width: 100%;
 }
 
-@media (prefers-color-scheme: light) {}
-
 @media only screen and (max-width: 750px) {
     .home-text {
         width: 95%;

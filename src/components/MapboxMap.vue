@@ -61,7 +61,7 @@ defineProps({
                     <label v-if="!marker.partnerActivity" class="negative-text small-text">
                         {{ $t('mapboxMap.currentlyUnavailable') }}
                     </label>
-                    <div v-if="selectedHost !== i" class="action-button flex x-centered y-centered"
+                    <div v-if="selectedHost !== i" class="action-button flex x-centered y-centered auto-margin"
                         :class="{ 'disabled': !marker.partnerActivity }" @click="selectHost(i, marker.id)">
                         {{ $t('mapboxMap.select') }}
                     </div>
@@ -132,7 +132,7 @@ label.selected {
     font-size: 14px;
 }
 
-@media (prefers-color-scheme: light) {
+.master-container.light {
     .mapbox-container {
         border-color: var(--black);
     }

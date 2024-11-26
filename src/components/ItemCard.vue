@@ -1,5 +1,6 @@
 <script setup>
 import store from '../store';
+import AddToCartButton from './AddToCartButton.vue';
 
 defineProps({
     itemInfo: {
@@ -24,13 +25,11 @@ defineProps({
 
 <template>
     <div class="item-card flex">
-        <img class="item-photo" :src="itemInfo.itemPhoto" alt="Photo">
+        <img class="item-photo" :src="itemInfo.itemPhoto[0]" alt="Photo">
         <div class="item-info-container flex column wide">
             <div class="flex column">
-                <h2 class="item-title">{{ itemInfo.itemTitle }}</h2>
-                <p class="item-short-description">{{ itemInfo.itemShortDescription }} <router-link
-                        :to="{ name: 'ItemDescription', params: { itemID: itemInfo.id } }" class="see-more-text">{{
-                            $t('itemCard.moreInfo') }}</router-link></p>
+                <h2 class="item-title">{{ itemInfo.itemTitle[$i18n.locale] }}</h2>
+                <p class="item-short-description">{{ itemInfo.itemShortDescription[$i18n.locale] }}</p>
                 <label class="item-price flex y-centered">
                     <span :class="{ 'strikethrough': itemInfo.itemOnSale, 'negative-text': itemInfo.itemOnSale }">
                         ${{ itemInfo.itemPrice.toFixed(2) }}
@@ -42,19 +41,18 @@ defineProps({
                         {{ $t('itemCard.saleTag') }}
                     </span>
                 </label>
-                <label class="unavailability-text bold negative-text" v-if="!itemInfo.itemAvailability">{{
+                <label class="unavailability-text bold" v-if="!itemInfo.itemAvailability">{{
                     $t('itemCard.unavailable') }}</label>
             </div>
-            <div class="flex y-centered space-between top-margin">
-                <div class="quantity-container flex">
-                    <button class="change-quantity-button centered-text" @click="changeCartQuantity(-1)"
-                        :class="{ 'disabled': cartQuantity <= 1 }">-</button>
-                    <input class="cart-quantity" type="number" v-model="cartQuantity" min="1" max="20">
-                    <button class="change-quantity-button" @click="changeCartQuantity(1)"
-                        :class="{ 'disabled': cartQuantity >= 20 }">+</button>
-                </div>
-                <button class="action-button add-button" :class="{ 'disabled': !itemInfo.itemAvailability }"
-                    @click="addToCart(); animateAdd($event)">{{ $t('itemCard.addToCart') }}</button>
+            <div class="flex y-centered right top-margin">
+                <AddToCartButton :item-info="itemInfo" :cart="cart" />
+
+                <button class="see-more-button action-button flex tall y-centered x-centered">
+                    <router-link :to="{ name: 'ItemDescription', params: { itemID: itemInfo.id } }"
+                        class="flex wide tall x-centered y-centered">
+                        <img src="/img/see.png" width="28" alt="See more">
+                    </router-link>
+                </button>
             </div>
         </div>
     </div>
@@ -62,34 +60,9 @@ defineProps({
 
 <script>
 export default {
-    name: 'ItemCard',
+    name: 'Item Card',
     data() {
         return {
-            cartQuantity: 1
-        }
-    },
-    methods: {
-        changeCartQuantity(amount) {
-            this.cartQuantity += amount;
-        },
-        addToCart() {
-            let addedItems = [];
-
-            for (let i = 0; i < this.cartQuantity; i++) {
-                addedItems.push(this.itemInfo);
-            }
-
-            store.dispatch("addToCart", { addedToCart: addedItems });
-        },
-        animateAdd(event) {
-            event.target.classList.add("disabled");
-            event.target.classList.add("added");
-            event.target.innerText = this.$t('itemCard.addedToCart');
-            setTimeout(() => {
-                event.target.classList.remove("disabled");
-                event.target.classList.remove("added");
-                event.target.innerText = this.$t('itemCard.addToCart');
-            }, 1500);
         }
     }
 }
@@ -120,18 +93,13 @@ export default {
 }
 
 .item-title {
+    font-size: 19px;
     margin: 0;
 }
 
 .item-short-description {
     font-size: 14px;
     margin: 0 0 4px 0;
-}
-
-.see-more-text {
-    font-weight: bold;
-    color: var(--soft-main-palette);
-    text-decoration: underline;
 }
 
 .item-price {
@@ -153,66 +121,48 @@ export default {
 
 .unavailability-text {
     font-size: 12px;
-}
-
-.quantity-container {
-    width: 45%;
-}
-
-.cart-quantity {
-    text-align: center;
-    width: 16%;
-    min-width: 15px;
-    margin: 0 5% 0 5%;
-    -moz-appearance: textfield;
-    padding-block: 0;
-    padding-inline: 5px;
-}
-
-.cart-quantity::-webkit-outer-spin-button,
-.cart-quantity::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-
-.change-quantity-button {
-    width: 27%;
-    min-width: 22px;
-    max-width: 45px;
-    border-radius: 6px;
-    font-weight: bold;
-    font-size: 21px;
-    border: 1px solid var(--black-mute);
-    background-color: var(--soft-main-palette);
     color: var(--pale-tone);
-    padding: 1px 6px 1px 6px;
-    padding-inline: 1px;
-    padding-block: 1px;
-    transition: all 0.2s;
-    cursor: pointer;
-
 }
 
 .add-button {
-    height: 35px;
     width: 50%;
+    max-width: 250px;
+    min-width: 150px;
+}
+
+.see-more-button {
+    background-color: var(--negative-main-palette);
+    padding-inline: 0;
+    width: 15%;
+    max-width: 200px;
+    min-width: 45px;
     border-radius: 4px;
     padding: 1px 4px 1px 4px;
-    padding-inline: 0;
-    max-width: 200px;
-    transition: all 0.2s;
-    line-height: 12px;
+    margin-left: 10px;
 }
 
-.add-button.added {
-    background: var(--success-tone);
-    color: var(--white);
+@media (max-width: 750px) {
+    .item-info-container {
+        margin-left: 3%;
+    }
+
+    .add-button {
+        width: 100%;
+    }
+
+    .see-more-button {
+        margin-left: 5px;
+    }
 }
 
-@media (prefers-color-scheme: light) {
+.master-container.light {
     .item-card {
         border-color: var(--indigo);
         background-color: var(--pale-grey);
+    }
+
+    .unavailability-text {
+        color: var(--indigo);
     }
 }
 </style>

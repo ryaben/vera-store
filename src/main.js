@@ -7,6 +7,7 @@ import { createI18n } from "vue-i18n";
 import messages from "@intlify/unplugin-vue-i18n/messages";
 import VueAwesomePaginate from "vue-awesome-paginate";
 import "vue-awesome-paginate/dist/style.css";
+import '@vuepic/vue-datepicker/dist/main.css';
 
 const i18n = createI18n({
     legacy: false,

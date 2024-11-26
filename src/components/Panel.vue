@@ -78,7 +78,7 @@ export default {
     transition: background-color 0.25s;
 }
 
-@media (prefers-color-scheme: light) {
+.master-container.light {
     .panel-card.selected:deep(.id-title) {
         color: var(--white-soft);
     }

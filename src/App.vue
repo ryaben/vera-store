@@ -10,34 +10,38 @@ const windowWidth = width;
 </script>
 
 <template>
-  <MobileBar v-if="windowWidth <= 750" :item-count="cartList.length" :links="[
-    { text: $t('app.navBarHomeButton'), route: 'Home' },
-    { text: $t('app.navBarStoreButton'), route: 'Store' },
-    { text: $t('app.navBarCartButton'), route: 'Cart' },
-    { text: $t('app.navBarFAQsButton'), route: 'FAQs' },
-    { text: $t('app.navBarAboutUsButton'), route: 'AboutUs' }
-  ]" />
-  <NavBar v-if="windowWidth > 750" :item-count="cartList.length" :buttons="[
-    { text: $t('app.navBarHomeButton'), icon: 'home.png', route: 'Home' },
-    { text: $t('app.navBarStoreButton'), icon: 'store.png', route: 'Store', subButtons: [{ text: $t('app.navBarProductsButton'), route: 'Store' }, { text: $t('app.navBarCartButton'), route: 'Cart' }] },
-    { text: $t('app.navBarInfoButton'), icon: 'info.png', route: 'FAQs', subButtons: [{ text: $t('app.navBarFAQsButton'), route: 'FAQs' }, { text: $t('app.navBarAboutUsButton'), route: 'AboutUs' }] }
-  ]" />
+  <div class="master-container flex column tall space-between" :class="{'dark': darkMode, 'light': !darkMode}">
+    <div class="flex column start">
+      <MobileBar v-if="windowWidth <= 750" :item-count="cartList.length" @dark-mode-toggled="applyDarkMode" :links="[
+        { text: $t('app.navBarHomeButton'), route: 'Home' },
+        { text: $t('app.navBarStoreButton'), route: 'Store' },
+        { text: $t('app.navBarCartButton'), route: 'Cart' },
+        { text: $t('app.navBarFAQsButton'), route: 'FAQs' },
+        { text: $t('app.navBarAboutUsButton'), route: 'AboutUs' }
+      ]" />
+      <NavBar v-if="windowWidth > 750" :item-count="cartList.length" :buttons="[
+        { text: $t('app.navBarHomeButton'), icon: 'home.png', route: 'Home' },
+        { text: $t('app.navBarStoreButton'), icon: 'store.png', route: 'Store', subButtons: [{ text: $t('app.navBarProductsButton'), route: 'Store' }, { text: $t('app.navBarCartButton'), route: 'Cart' }] },
+        { text: $t('app.navBarInfoButton'), icon: 'info.png', route: 'FAQs', subButtons: [{ text: $t('app.navBarFAQsButton'), route: 'FAQs' }, { text: $t('app.navBarAboutUsButton'), route: 'AboutUs' }] }
+      ]" />
 
-  <main>
-    <router-view v-slot="{ Component }">
-      <Transition name="fade" mode="out-in">
-        <KeepAlive :include="['Store', 'Cart', 'Admin Panel']">
-          <component :is="Component" :items-list="itemsList" :orders-list="ordersList" :cart-list="cartList"
-            :partners-list="partnersList" :coupons-list="couponsList" :checkout-amount="checkoutAmount" />
-        </KeepAlive>
-      </Transition>
-    </router-view>
-  </main>
+      <main>
+        <router-view v-slot="{ Component }">
+          <Transition name="fade" mode="out-in">
+            <KeepAlive :include="['Store', 'Cart', 'Admin Panel']">
+              <component :is="Component" :items-list="itemsList" :orders-list="ordersList" :cart-list="cartList"
+                :partners-list="partnersList" :coupons-list="couponsList" :checkout-amount="checkoutAmount" />
+            </KeepAlive>
+          </Transition>
+        </router-view>
+      </main>
+    </div>
 
-  <DesktopFooter v-if="windowWidth > 750" />
+    <DesktopFooter v-if="windowWidth > 750" @dark-mode-toggled="applyDarkMode" />
+  </div>
 
   <RoundLink v-if="windowWidth <= 750" id="whatsappLink" :icon="'whatsapp'"
-    :href="'https://api.whatsapp.com/send?phone=5491132703200'" :width="42" :height="42" />
+    :href="'https://api.whatsapp.com/send?phone=5491132703200'" :width="40" :height="40" />
   <notifications position="top center" width="350px" :speed="700" :pause-on-hover="true" />
 </template>
 
@@ -48,7 +52,7 @@ export default {
   },
   data() {
     return {
-
+      darkMode: undefined
     }
   },
   computed: {
@@ -71,14 +75,18 @@ export default {
       return Number(store.getters.checkout);
     }
   },
-  async beforeCreate() {
-    await store.dispatch('getItems');
-    await store.dispatch('getPartners');
-    await store.dispatch('getCoupons');
+  methods: {
+    applyDarkMode(value) {
+      this.darkMode = value;
+    }
   },
   beforeMount() {
-    if (!localStorage.getItem('lang')) {
-      localStorage.setItem('lang', JSON.stringify({ title: 'Welcome to our store!', image: '/img/english.png', value: 'en' }));
+    if (!localStorage.getItem('language')) {
+      localStorage.setItem('language', JSON.stringify({ title: 'Welcome to our store!', image: '/img/english.png', value: 'en' }));
+    }
+
+    if (localStorage.getItem('shoppingCart')) {
+      store.dispatch("addToCart", { addedToCart: JSON.parse(localStorage.getItem('shoppingCart')) });
     }
   }
 }
@@ -87,7 +95,7 @@ export default {
 <style scoped>
 #whatsappLink {
   position: fixed;
-  right: 4dvw;
-  bottom: 4dvw;
+  right: 3.5dvw;
+  bottom: 3.5dvw;
 }
 </style>

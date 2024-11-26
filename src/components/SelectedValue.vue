@@ -4,6 +4,11 @@ defineProps({
         type: String,
         required: true,
         default: 'Value'
+    },
+    deletable: {
+        type: Boolean,
+        required: false,
+        default: true
     }
 });
 </script>
@@ -11,7 +16,7 @@ defineProps({
 <template>
     <div class="selected-value-container">
         <label class="value-text">{{ langText }}</label>
-        <label class="remove-value" @click="removeValue">❌</label>
+        <label v-if="deletable" class="remove-value" @click="removeValue">❌</label>
     </div>
 </template>
   
@@ -32,8 +37,8 @@ export default {
     align-items: center;
     border-radius: 13px;
     width: fit-content;
-    background-color: var(--soft-main-palette);
-    padding: 3px;
+    background-color: var(--light-main-palette);
+    padding: 3px 8px 3px 8px;
     margin: 6px 3px 0 0;
 }
 

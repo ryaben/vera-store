@@ -46,7 +46,7 @@ export default {
 .dropdown-box {
   width: 93%;
   max-width: 800px;
-  border: 3px solid var(--soft-main-palette);
+  border: 3px solid var(--light-main-palette);
   border-radius: 8px;
   margin-block-end: 0;
   margin-block-start: 0;
@@ -66,7 +66,7 @@ export default {
 }
 
 .box-title:hover, .box-title.active {
-  background-color: var(--soft-main-palette);
+  background-color: var(--light-main-palette);
   color: var(--white-soft);
   transition: 200ms;
   cursor: pointer;

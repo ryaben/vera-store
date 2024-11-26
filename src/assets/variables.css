@@ -1,6 +1,6 @@
 /* color palette from <https://github.com/vuejs/theme> */
 :root {
-  --font-family: Cambria;
+  --font-family: 'Cambria';
 
   --white: #ffffff;
   --white-soft: #f8f8f8;
@@ -19,6 +19,7 @@
   --indigo-dark: #1f2f3f;
 
   --intense-main-palette: #4ca299;
+  --brown-main-palette: #552801;
   --soft-main-palette: #9b784b;
   --light-main-palette: #b88c75;
   --dimmed-main-palette: #d5b18f;
