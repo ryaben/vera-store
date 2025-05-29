@@ -214,10 +214,10 @@ export default {
         sortItems() {
             switch (this.selectedSort.value) {
                 case 'ascendingOrder':
-                    this.itemsList.sort((a, b) => (this.normalizeString(a.itemTitle) > this.normalizeString(b.itemTitle)) ? 1 : -1);
+                    this.itemsList.sort((a, b) => (this.normalizeString(a.itemTitle[this.$i18n.locale]) > this.normalizeString(b.itemTitle[this.$i18n.locale])) ? 1 : -1);
                     break;
                 case 'descendingOrder':
-                    this.itemsList.sort((a, b) => (this.normalizeString(a.itemTitle) > this.normalizeString(b.itemTitle)) ? 1 : -1);
+                    this.itemsList.sort((a, b) => (this.normalizeString(a.itemTitle[this.$i18n.locale]) > this.normalizeString(b.itemTitle[this.$i18n.locale])) ? 1 : -1);
                     this.itemsList.reverse();
                     break;
                 case 'highestPrice':
@@ -245,7 +245,7 @@ export default {
                 });
             } else {
                 this.itemsList.forEach(function (element) {
-                    const entryCurated = that.normalizeString(element.itemTitle.toLowerCase());
+                    const entryCurated = that.normalizeString(element.itemTitle[that.$i18n.locale].toLowerCase());
                     const searchCurated = that.normalizeString(that.filteredSearch.toLowerCase());
 
                     if (!entryCurated.includes(searchCurated)) {
@@ -319,8 +319,9 @@ export default {
         arrayContainsAny(array1, array2) {
             return array1.some(item => array2.includes(item));
         },
-        normalizeString(string) {
-            return string.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        normalizeString(input) {
+            const str = typeof input === 'string' ? input : String(input ?? '');
+            return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
         }
     },
     async beforeMount() {
